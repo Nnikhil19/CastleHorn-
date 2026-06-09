@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CastleHorn — UT Austin Student Resources</title>
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-brand">CastleHorn</div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-auth">
+      <button class="btn btn-ghost" id="nav-login-btn">Log In</button>
+      <button class="btn btn-primary" id="nav-register-btn">Sign Up</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <span class="badge">Built for Longhorns</span>
+      <h1>Your Campus.<br>Your City.<br><span class="accent">Your Resource.</span></h1>
+      <p class="hero-sub">CastleHorn connects UT Austin students with city services, opportunities, and tools — built by City of Austin interns who know exactly what you need.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="hero-register-btn">Get Started Free</button>
+        <a href="#features" class="btn btn-ghost">Learn More</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="tower"></div>
+      <div class="horn"></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="features">
+    <h2>Everything You Need, One Place</h2>
+    <p class="section-sub">From housing to transit, internships to events — CastleHorn has you covered.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🏘️</div>
+        <h3>Housing Finder</h3>
+        <p>Browse affordable housing near campus vetted for UT students.</p>
+      </div>
+     
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <div class="about-text">
+      <h2>Built by Interns, for Students</h2>
+      <p>CastleHorn is a project by <strong>City of Austin interns</strong> who were once in your shoes. We built the resource we wish we had — a single platform that bridges UT campus life with the broader Austin community.</p>
+      <p>Our team spans engineering, design, and public policy, all united by one goal: make Austin more accessible for every Longhorn.</p>
+    </div>
+    <div class="about-stats">
+      <div class="stat">
+        <span class="stat-num">50K+</span>
+        <span class="stat-label">UT Students</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">200+</span>
+        <span class="stat-label">Resources Listed</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">100%</span>
+        <span class="stat-label">Free to Use</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="get-started" class="cta-section">
+    <h2>Ready to Explore Austin?</h2>
+    <p>Join thousands of UT students already using CastleHorn.</p>
+    <button class="btn btn-white" id="cta-register-btn">Create Free Account</button>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="contact" class="footer">
+    <div class="footer-brand">CastleHorn</div>
+    <p>A City of Austin Intern Project &mdash; Made with ♥ for UT Students</p>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="mailto:nikhilsyt.2010@gmail.com">Contact</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 CastleHorn. Hook 'Em!</p>
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+
+      <!-- LOGIN PANEL -->
+      <div class="modal-panel" id="panel-login">
+        <h2 id="modal-title">Welcome Back</h2>
+        <p class="modal-sub">Log in to your CastleHorn account.</p>
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" placeholder="you@utexas.edu" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+          <p class="form-error" id="login-error"></p>
+          <button type="submit" class="btn btn-primary btn-full" id="login-submit">Log In</button>
+        </form>
+        <p class="modal-switch">Don't have an account? <button class="link-btn" id="switch-to-register">Sign up</button></p>
+      </div>
+
+      <!-- REGISTER PANEL -->
+      <div class="modal-panel hidden" id="panel-register">
+        <h2>Create Account</h2>
+        <p class="modal-sub">Join CastleHorn — it's free.</p>
+        <form id="register-form" novalidate>
+          <div class="field">
+            <label for="reg-name">Full Name</label>
+            <input type="text" id="reg-name" placeholder="Jane Longhorn" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" placeholder="you@utexas.edu" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="reg-password">Password <span class="hint">(min 8 characters)</span></label>
+            <input type="password" id="reg-password" placeholder="••••••••" required minlength="8" autocomplete="new-password">
+          </div>
+          <p class="form-error" id="register-error"></p>
+          <button type="submit" class="btn btn-primary btn-full" id="register-submit">Create Account</button>
+        </form>
+        <p class="modal-switch">Already have an account? <button class="link-btn" id="switch-to-login">Log in</button></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
