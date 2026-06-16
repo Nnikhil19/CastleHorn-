@@ -1,0 +1,112 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { addListing } from "../lib/listings";
+import "./Sublets.css";
+
+const formatDate = (iso) => {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+};
+
+export default function CreateListing() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    title: "", startDate: "", endDate: "", term: "weeks", price: "", unit: "per stay", desc: "", name: "",
+  });
+  const [error, setError] = useState("");
+
+  const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const price = parseInt(form.price, 10);
+    if (!form.title || !form.startDate || !form.endDate || !form.desc || !form.name || isNaN(price)) {
+      setError("Please fill in all fields with a valid price.");
+      return;
+    }
+    if (form.endDate < form.startDate) {
+      setError("End date must be after the start date.");
+      return;
+    }
+
+    addListing({
+      title: form.title,
+      dates: `${formatDate(form.startDate)} – ${formatDate(form.endDate)}`,
+      term: form.term,
+      price,
+      priceUnit: form.unit,
+      desc: form.desc,
+      postedBy: form.name,
+    });
+    navigate("/sublets");
+  };
+
+  return (
+    <div className="sub-page">
+      <nav className="sub-nav">
+        <Link to="/" className="sub-brand">Castle<span>Horn</span></Link>
+        <Link to="/sublets" className="sub-back">← Back to listings</Link>
+      </nav>
+
+      <div className="cl-wrap">
+        <div className="sub-panel cl-panel">
+          <h3>Create a Listing</h3>
+          <p className="cl-sub">Post your sublet for fellow Longhorns to find.</p>
+
+          <form onSubmit={handleSubmit} className="sub-form">
+            <label htmlFor="new-title">Place Name</label>
+            <input id="new-title" type="text" required placeholder="e.g. Apartment Room"
+              value={form.title} onChange={(e) => setField("title", e.target.value)} />
+
+            <label>Dates Available</label>
+            <div className="cl-date-row">
+              <div>
+                <label htmlFor="new-start-date" className="cl-date-sublabel">Start</label>
+                <input id="new-start-date" type="date" required
+                  value={form.startDate} onChange={(e) => setField("startDate", e.target.value)} />
+              </div>
+              <div>
+                <label htmlFor="new-end-date" className="cl-date-sublabel">End</label>
+                <input id="new-end-date" type="date" required
+                  min={form.startDate || undefined}
+                  value={form.endDate} onChange={(e) => setField("endDate", e.target.value)} />
+              </div>
+            </div>
+
+            <label htmlFor="new-term">Lease Term</label>
+            <select id="new-term" value={form.term} onChange={(e) => setField("term", e.target.value)}>
+              <option value="weeks">1–3 Weeks</option>
+              <option value="summer">Summer (May–Aug)</option>
+              <option value="winter">Winter (Dec–Jan)</option>
+            </select>
+
+            <label htmlFor="new-price">Price ($)</label>
+            <input id="new-price" type="number" required placeholder="e.g. 650"
+              value={form.price} onChange={(e) => setField("price", e.target.value)} />
+
+            <label htmlFor="new-unit">Price Type</label>
+            <select id="new-unit" value={form.unit} onChange={(e) => setField("unit", e.target.value)}>
+              <option value="per stay">per stay</option>
+              <option value="per month">per month</option>
+            </select>
+
+            <label htmlFor="new-desc">Description</label>
+            <textarea id="new-desc" rows={4} required placeholder="Short details…"
+              value={form.desc} onChange={(e) => setField("desc", e.target.value)} />
+
+            <label htmlFor="new-name">Your Name</label>
+            <input id="new-name" type="text" required placeholder="e.g. Sarah M."
+              value={form.name} onChange={(e) => setField("name", e.target.value)} />
+
+            {error && <p className="cl-error">{error}</p>}
+
+            <button type="submit" className="sub-btn">Post Listing</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
