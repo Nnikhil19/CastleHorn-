@@ -5,11 +5,16 @@ import "./Sublets.css";
 
 export default function Sublets() {
   const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filterTerm, setFilterTerm] = useState("all");
   const [maxBudget, setMaxBudget] = useState("");
 
   useEffect(() => {
-    setListings(getListings());
+    let active = true;
+    getListings()
+      .then((data) => active && setListings(data))
+      .finally(() => active && setLoading(false));
+    return () => { active = false; };
   }, []);
 
   const filtered = useMemo(() => {
@@ -56,7 +61,9 @@ export default function Sublets() {
         {/* ── Feed ── */}
         <main className="sub-feed">
           <h2 className="sub-feed-title">Available Sublets</h2>
-          {filtered.length === 0 ? (
+          {loading ? (
+            <p className="sub-empty">Loading listings…</p>
+          ) : filtered.length === 0 ? (
             <p className="sub-empty">No verified matches found matching these parameters.</p>
           ) : (
             filtered.map((item) => (

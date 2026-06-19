@@ -26,6 +26,10 @@ export default function Home() {
   const goRegister = () => navigate("/auth?mode=register");
   const goLogin    = () => navigate("/auth?mode=login");
   const handleLogout = () => signOut(auth);
+  const scrollTo = (id) => (e) => {
+    e.preventDefault();
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, setUser);
@@ -39,10 +43,10 @@ export default function Home() {
       <nav className="nav">
         <div className="nav-brand">Castle<span>Horn</span></div>
         <ul className="nav-links">
-          <li><a href="#features">Features</a></li>
-          <li><a href="#about">About</a></li>
+          <li><a href="#features" onClick={scrollTo("features")}>Features</a></li>
+          <li><a href="#about" onClick={scrollTo("about")}>About</a></li>
           <li><Link to="/sublets">Listings</Link></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#contact" onClick={scrollTo("contact")}>Contact</a></li>
         </ul>
         <div className="nav-auth">
           {user ? (
@@ -77,7 +81,7 @@ export default function Home() {
               Get Started Free
             </button>
             <Link to="/sublets" className="btn btn-ghost btn-lg">View Listings</Link>
-            <a href="#features" className="btn btn-ghost btn-lg">Learn More</a>
+            <a href="#features" onClick={scrollTo("features")} className="btn btn-ghost btn-lg">Learn More</a>
           </div>
         </div>
         <div className="hero-visual" aria-hidden="true">
@@ -162,11 +166,11 @@ export default function Home() {
         <div className="footer-top">
           <div className="footer-brand">Castle<span>Horn</span></div>
           <nav className="footer-links">
-            <a href="#features">Features</a>
-            <a href="#about">About</a>
+            <a href="#features" onClick={scrollTo("features")}>Features</a>
+            <a href="#about" onClick={scrollTo("about")}>About</a>
             <a href="mailto:nikhilsyt.2010@gmail.com">Contact</a>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
+            <a href="#" onClick={(e) => e.preventDefault()}>Privacy</a>
+            <a href="#" onClick={(e) => e.preventDefault()}>Terms</a>
           </nav>
         </div>
         <div className="footer-bottom">

@@ -17,10 +17,11 @@ export default function CreateListing() {
     title: "", startDate: "", endDate: "", term: "weeks", price: "", unit: "per stay", desc: "", name: "",
   });
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const price = parseInt(form.price, 10);
     if (!form.title || !form.startDate || !form.endDate || !form.desc || !form.name || isNaN(price)) {
@@ -32,16 +33,24 @@ export default function CreateListing() {
       return;
     }
 
-    addListing({
-      title: form.title,
-      dates: `${formatDate(form.startDate)} – ${formatDate(form.endDate)}`,
-      term: form.term,
-      price,
-      priceUnit: form.unit,
-      desc: form.desc,
-      postedBy: form.name,
-    });
-    navigate("/sublets");
+    setError("");
+    setSubmitting(true);
+    try {
+      await addListing({
+        title: form.title,
+        dates: `${formatDate(form.startDate)} – ${formatDate(form.endDate)}`,
+        term: form.term,
+        price,
+        priceUnit: form.unit,
+        desc: form.desc,
+        postedBy: form.name,
+      });
+      navigate("/sublets");
+    } catch (err) {
+      console.error(err);
+      setError("Couldn't save your listing. Please try again.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -103,7 +112,9 @@ export default function CreateListing() {
 
             {error && <p className="cl-error">{error}</p>}
 
-            <button type="submit" className="sub-btn">Post Listing</button>
+            <button type="submit" className="sub-btn" disabled={submitting}>
+              {submitting ? "Posting…" : "Post Listing"}
+            </button>
           </form>
         </div>
       </div>
