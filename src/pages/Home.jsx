@@ -1,28 +1,57 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
+import { getListings, listingImage, listingImageFallback, TERM_LABELS } from "../lib/listings";
 import "./Home.css";
 
-const FEATURES = [
-  { icon: "🏘️", title: "Housing Finder",   desc: "Browse affordable, student-vetted sublets near UT campus.", link: "/sublets" },
-  { icon: "🚌", title: "Transit Guide",    desc: "CapMetro routes, passes, and real-time schedules for Longhorns." },
-  { icon: "💼", title: "Internship Board", desc: "City of Austin and local internships curated for UT students." },
-  { icon: "🎟️", title: "Events & Culture", desc: "Free and discounted Austin events, concerts, and campus happenings." },
-  { icon: "🍔", title: "Food Resources",   desc: "Food pantries, free meals, and student discount dining near campus." },
-  { icon: "🩺", title: "Health & Wellness",desc: "Low-cost clinics, mental health services, and UT health resources." },
+const CATEGORIES = [
+  { value: "all", label: "All categories" },
+  { value: "weeks", label: "1–3 Weeks" },
+  { value: "summer", label: "Summer" },
+  { value: "winter", label: "Winter" },
 ];
 
-const STATS = [
-  { num: "50K+",  label: "UT Students" },
-  { num: "200+",  label: "Resources Listed" },
-  { num: "100%",  label: "Free to Use" },
-  { num: "6",     label: "Categories" },
+const BLOGS = [
+  { title: "How to spot a trustworthy sublet near UT", date: "Jul 25, 2026" },
+  { title: "Subleasing 101: what every Longhorn should know", date: "Jul 25, 2026" },
+  { title: "Best West Campus neighborhoods for students", date: "Jul 25, 2026" },
+  { title: "Splitting rent & utilities the fair way", date: "Jul 25, 2026" },
 ];
+
+function RoomCard({ item, onClick }) {
+  return (
+    <div className="room-card" onClick={onClick} role="button" tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter") onClick(); }}>
+      <div className="room-card-imgwrap">
+        <img
+          className="room-card-img"
+          src={listingImage(item)}
+          alt={item.title}
+          loading="lazy"
+          onError={(e) => { e.currentTarget.src = listingImageFallback(item); }}
+        />
+      </div>
+      <div className="room-card-body">
+        <div className="room-card-row">
+          <h3>{item.location || item.title}</h3>
+          <span className="room-card-rating">★ {item.rating ?? "New"}</span>
+        </div>
+        <p className="room-card-dates">{item.dates}</p>
+        <p className="room-card-price">
+          <strong>${item.price}</strong> {item.priceUnit}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [listings, setListings] = useState([]);
+  const [category, setCategory] = useState("all");
+
   const goRegister = () => navigate("/auth?mode=register");
   const goLogin    = () => navigate("/auth?mode=login");
   const handleLogout = () => signOut(auth);
@@ -36,6 +65,17 @@ export default function Home() {
     return unsub;
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    getListings().then((data) => active && setListings(data));
+    return () => { active = false; };
+  }, []);
+
+  const shown = useMemo(() => {
+    const list = category === "all" ? listings : listings.filter((l) => l.term === category);
+    return list.slice(0, 6);
+  }, [listings, category]);
+
   return (
     <div className="home">
 
@@ -43,10 +83,10 @@ export default function Home() {
       <nav className="nav">
         <div className="nav-brand">Castle<span>Horn</span></div>
         <ul className="nav-links">
-          <li><a href="#features" onClick={scrollTo("features")}>Features</a></li>
+          <li><a href="#home" onClick={scrollTo("home")}>Home</a></li>
+          <li><a href="#rooms" onClick={scrollTo("rooms")}>Rooms</a></li>
+          <li><a href="#blogs" onClick={scrollTo("blogs")}>Blogs</a></li>
           <li><a href="#about" onClick={scrollTo("about")}>About</a></li>
-          <li><Link to="/sublets">Listings</Link></li>
-          <li><a href="#contact" onClick={scrollTo("contact")}>Contact</a></li>
         </ul>
         <div className="nav-auth">
           {user ? (
@@ -64,69 +104,112 @@ export default function Home() {
       </nav>
 
       {/* ── HERO ── */}
-      <section className="hero">
-        <div className="hero-content">
-          <span className="badge">Built for Longhorns 🤘</span>
-          <h1>
-            Your Campus.<br />
-            Your City.<br />
-            <span className="accent">Your Resource.</span>
-          </h1>
+      <section className="hero" id="home">
+        <div className="hero-overlay" />
+        <div className="hero-inner">
+          <h1>Experience Unforgettable Stays<br />Near UT Austin</h1>
           <p className="hero-sub">
-            CastleHorn connects UT Austin students with city services, opportunities,
-            and tools — built by City of Austin interns who know exactly what you need.
+            Discover student-vetted sublets tailored just for you — whether it's a
+            semester away, a summer internship, or winter break.
           </p>
-          <div className="hero-actions">
-            <button className="btn btn-primary btn-lg" onClick={goRegister}>
-              Get Started Free
+
+          <div className="search-bar">
+            <div className="search-field">
+              <label>Where</label>
+              <input type="text" placeholder="Add destination" id="search-where" />
+            </div>
+            <div className="search-field">
+              <label>Check in</label>
+              <input type="date" id="search-in" />
+            </div>
+            <div className="search-field">
+              <label>Check out</label>
+              <input type="date" id="search-out" />
+            </div>
+            <div className="search-field">
+              <label>Who</label>
+              <input type="text" placeholder="Add guests" id="search-who" />
+            </div>
+            <button className="search-btn" onClick={() => navigate("/sublets")} aria-label="Search">
+              🔍
             </button>
-            <Link to="/sublets" className="btn btn-ghost btn-lg">View Listings</Link>
-            <a href="#features" onClick={scrollTo("features")} className="btn btn-ghost btn-lg">Learn More</a>
           </div>
-        </div>
-        <div className="hero-visual" aria-hidden="true">
-          <div className="tower-wrap">
-            <div className="tower-spire" />
-            <div className="tower-body" />
-            <div className="tower-base" />
-            <div className="tower-arch" />
-          </div>
-          <div className="hero-glow" />
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section id="features" className="features">
-        <div className="section-header">
-          <span className="badge">What We Offer</span>
-          <h2>Everything You Need, One Place</h2>
-          <p className="section-sub">
-            From housing to transit, internships to events — CastleHorn has you covered.
-          </p>
-        </div>
-        <div className="cards">
-          {FEATURES.map(({ icon, title, desc, link }) => (
-            <div
-              className={`card ${link ? "card-clickable" : ""}`}
-              key={title}
-              onClick={link ? () => navigate(link) : undefined}
-              role={link ? "button" : undefined}
-              tabIndex={link ? 0 : undefined}
+      {/* ── EXPLORE ROOMS ── */}
+      <section id="rooms" className="rooms">
+        <h2 className="rooms-title">Explore Available Sublets</h2>
+        <div className="cat-tabs">
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.value}
+              className={`cat-tab ${category === c.value ? "active" : ""}`}
+              onClick={() => setCategory(c.value)}
             >
-              <div className="card-icon">{icon}</div>
-              <h3>{title}</h3>
-              <p>{desc}</p>
-              {link && <span className="card-link">Explore →</span>}
-            </div>
+              {c.label}
+            </button>
           ))}
+        </div>
+
+        <div className="rooms-grid">
+          {shown.length === 0 ? (
+            <p className="rooms-empty">No sublets in this category yet.</p>
+          ) : (
+            shown.map((item) => (
+              <RoomCard key={item.id} item={item} onClick={() => navigate(`/sublets/${item.id}`)} />
+            ))
+          )}
+        </div>
+
+        <div className="rooms-cta">
+          <Link to="/sublets" className="btn btn-ghost btn-lg">View all listings</Link>
+        </div>
+      </section>
+
+      {/* ── BLOGS ── */}
+      <section id="blogs" className="blogs">
+        <h2 className="blogs-title">Tips &amp; Guides</h2>
+        <div className="blogs-grid">
+          <article className="blog-feature">
+            <img
+              src={listingImage({ id: "blog-hero" })}
+              alt=""
+              onError={(e) => { e.currentTarget.src = listingImageFallback({ id: "blog-hero" }); }}
+            />
+            <div className="blog-feature-body">
+              <h3>The complete guide to subleasing as a UT student</h3>
+              <p>
+                Everything from vetting roommates to splitting deposits — a practical
+                walkthrough so your next sublet goes smoothly.
+              </p>
+              <span className="blog-date">📅 Jul 25, 2026</span>
+            </div>
+          </article>
+
+          <div className="blog-list">
+            {BLOGS.map((b, i) => (
+              <article className="blog-item" key={b.title}>
+                <img
+                  src={listingImage({ id: `blog-${i}` })}
+                  alt=""
+                  onError={(e) => { e.currentTarget.src = listingImageFallback({ id: `blog-${i}` }); }}
+                />
+                <div className="blog-item-body">
+                  <h4>{b.title}</h4>
+                  <span className="blog-date">📅 {b.date}</span>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── ABOUT ── */}
       <section id="about" className="about">
         <div className="about-text">
-          <span className="badge">Our Story</span>
-          <h2>Built by Interns,<br />for Students</h2>
+          <span className="badge">About CastleHorn</span>
+          <h2>Built by Interns, for Students</h2>
           <p>
             CastleHorn is a project by <strong>City of Austin interns</strong> who were once
             in your shoes. We built the resource we wish we had — a single platform that bridges
@@ -136,46 +219,46 @@ export default function Home() {
             Our team spans engineering, design, and public policy, all united by one goal:
             make Austin more accessible for every Longhorn.
           </p>
-          <button className="btn btn-primary" onClick={goRegister}>
-            Join the Community
-          </button>
+          <button className="btn btn-primary" onClick={goRegister}>Join the Community</button>
         </div>
-        <div className="about-stats">
-          {STATS.map(({ num, label }) => (
-            <div className="stat" key={label}>
-              <span className="stat-num">{num}</span>
-              <span className="stat-label">{label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="cta-section">
-        <div className="cta-inner">
-          <h2>Ready to Explore Austin?</h2>
-          <p>Join thousands of UT students already using CastleHorn. It's completely free.</p>
-          <button className="btn btn-white btn-lg" onClick={goRegister}>
-            Create Free Account
-          </button>
+        <div className="about-photos">
+          <img className="about-photo p1" src={listingImage({ id: "about-1" })} alt=""
+            onError={(e) => { e.currentTarget.src = listingImageFallback({ id: "about-1" }); }} />
+          <img className="about-photo p2" src={listingImage({ id: "about-2" })} alt=""
+            onError={(e) => { e.currentTarget.src = listingImageFallback({ id: "about-2" }); }} />
+          <img className="about-photo p3" src={listingImage({ id: "about-3" })} alt=""
+            onError={(e) => { e.currentTarget.src = listingImageFallback({ id: "about-3" }); }} />
         </div>
       </section>
 
       {/* ── FOOTER ── */}
       <footer id="contact" className="footer">
-        <div className="footer-top">
-          <div className="footer-brand">Castle<span>Horn</span></div>
-          <nav className="footer-links">
-            <a href="#features" onClick={scrollTo("features")}>Features</a>
-            <a href="#about" onClick={scrollTo("about")}>About</a>
-            <a href="mailto:nikhilsyt.2010@gmail.com">Contact</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>Privacy</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>Terms</a>
-          </nav>
+        <div className="footer-cols">
+          <div className="footer-brand-col">
+            <div className="footer-brand">Castle<span>Horn</span></div>
+            <p>A City of Austin Intern Project — made with ♥ for UT students.</p>
+          </div>
+          <div className="footer-col">
+            <h4>Programs</h4>
+            <a href="#rooms" onClick={scrollTo("rooms")}>Browse Sublets</a>
+            <Link to="/sublets/new">Post a Listing</Link>
+            <Link to="/auth?mode=register">Create Account</Link>
+          </div>
+          <div className="footer-col">
+            <h4>Help &amp; Support</h4>
+            <a href="#blogs" onClick={scrollTo("blogs")}>Tips &amp; Guides</a>
+            <a href="mailto:nikhilsyt.2010@gmail.com">Contact Us</a>
+            <a href="#" onClick={(e) => e.preventDefault()}>Terms &amp; Privacy</a>
+          </div>
+          <div className="footer-col">
+            <h4>Follow Us</h4>
+            <a href="#" onClick={(e) => e.preventDefault()}>Instagram</a>
+            <a href="#" onClick={(e) => e.preventDefault()}>Twitter / X</a>
+            <a href="#" onClick={(e) => e.preventDefault()}>YouTube</a>
+          </div>
         </div>
         <div className="footer-bottom">
-          <p>A City of Austin Intern Project — Made with ♥ for UT Students</p>
-          <p className="footer-copy">© 2026 CastleHorn. Hook 'Em! 🤘</p>
+          <p>© 2026 CastleHorn. Hook 'Em! 🤘</p>
         </div>
       </footer>
 

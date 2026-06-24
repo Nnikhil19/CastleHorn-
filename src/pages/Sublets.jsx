@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getListings, listingImage, TERM_LABELS, FEATURE_LABELS } from "../lib/listings";
+import { getListings, listingImage, listingImageFallback, TERM_LABELS, FEATURE_LABELS } from "../lib/listings";
 import "./Sublets.css";
 
 export default function Sublets() {
@@ -100,7 +100,8 @@ export default function Sublets() {
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === "Enter") navigate(`/sublets/${item.id}`); }}
               >
-                <img className="sub-card-img" src={listingImage(item)} alt={item.title} loading="lazy" />
+                <img className="sub-card-img" src={listingImage(item)} alt={item.title} loading="lazy"
+                  onError={(e) => { e.currentTarget.src = listingImageFallback(item); }} />
                 <div className="sub-card-main">
                   <h3>{item.title}</h3>
                   <p className="sub-meta">📅 {item.dates}</p>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getListingById, listingImage, TERM_LABELS, FEATURE_LABELS } from "../lib/listings";
+import { getListingById, listingImage, listingImageFallback, TERM_LABELS, FEATURE_LABELS } from "../lib/listings";
 import "./Sublets.css";
 
 export default function ListingDetail() {
@@ -33,7 +33,8 @@ export default function ListingDetail() {
       ) : (
         <div className="ld-wrap">
           <div className="ld-hero">
-            <img className="ld-img" src={listingImage(listing)} alt={listing.title} />
+            <img className="ld-img" src={listingImage(listing)} alt={listing.title}
+              onError={(e) => { e.currentTarget.src = listingImageFallback(listing); }} />
             <div className="ld-price-badge">
               ${listing.price} <span>{listing.priceUnit}</span>
             </div>
@@ -41,7 +42,10 @@ export default function ListingDetail() {
 
           <div className="ld-body">
             <h1 className="ld-title">{listing.title}</h1>
-            <p className="ld-postedby">Posted by {listing.postedBy}</p>
+            <p className="ld-postedby">
+              {listing.location ? `${listing.location} · ` : ""}Posted by {listing.postedBy}
+              {listing.rating ? ` · ★ ${listing.rating}` : ""}
+            </p>
 
             <div className="ld-facts">
               <div className="ld-fact">
