@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { addListing, FEATURE_LABELS } from "../lib/listings";
+import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import "./Sublets.css";
 
 const formatDate = (iso) => {
@@ -130,9 +131,14 @@ export default function CreateListing() {
 
             {error && <p className="cl-error">{error}</p>}
 
-            <button type="submit" className="sub-btn" disabled={submitting}>
+            <LiquidButton
+              type="submit"
+              size="xl"
+              disabled={submitting}
+              className="text-white border border-white/30 rounded-full w-full mt-1"
+            >
               {submitting ? "Posting…" : "Post Listing"}
-            </button>
+            </LiquidButton>
           </form>
         </div>
       </div>

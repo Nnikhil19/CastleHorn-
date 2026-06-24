@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getListingById, listingImage, listingImageFallback, TERM_LABELS, FEATURE_LABELS } from "../lib/listings";
+import { CalendarIcon, TagIcon, DollarIcon } from "../components/icons";
 import "./Sublets.css";
 
 export default function ListingDetail() {
@@ -50,15 +51,15 @@ export default function ListingDetail() {
             <div className="ld-facts">
               <div className="ld-fact">
                 <span className="ld-fact-label">Dates Available</span>
-                <span className="ld-fact-value">📅 {listing.dates}</span>
+                <span className="ld-fact-value"><CalendarIcon width={15} height={15} /> {listing.dates}</span>
               </div>
               <div className="ld-fact">
                 <span className="ld-fact-label">Lease Term</span>
-                <span className="ld-fact-value">🏷️ {TERM_LABELS[listing.term] ?? listing.term}</span>
+                <span className="ld-fact-value"><TagIcon width={15} height={15} /> {TERM_LABELS[listing.term] ?? listing.term}</span>
               </div>
               <div className="ld-fact">
                 <span className="ld-fact-label">Price</span>
-                <span className="ld-fact-value">💲 ${listing.price} {listing.priceUnit}</span>
+                <span className="ld-fact-value"><DollarIcon width={15} height={15} /> ${listing.price} {listing.priceUnit}</span>
               </div>
             </div>
 

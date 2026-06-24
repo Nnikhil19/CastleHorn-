@@ -1,9 +1,16 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { getListings, listingImage, listingImageFallback, TERM_LABELS } from "../lib/listings";
+import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import { SearchIcon, CalendarIcon } from "../components/icons";
 import "./Home.css";
+
+// Lazy so three.js is split into its own chunk, loaded only when the band renders.
+const WebGLShader = lazy(() =>
+  import("@/components/ui/web-gl-shader").then((m) => ({ default: m.WebGLShader }))
+);
 
 const CATEGORIES = [
   { value: "all", label: "All categories" },
@@ -131,7 +138,7 @@ export default function Home() {
               <input type="text" placeholder="Add guests" id="search-who" />
             </div>
             <button className="search-btn" onClick={() => navigate("/sublets")} aria-label="Search">
-              🔍
+              <SearchIcon width={18} height={18} />
             </button>
           </div>
         </div>
@@ -167,6 +174,29 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── HOST CTA (live shader band) ── */}
+      <section className="host-cta">
+        <Suspense fallback={null}>
+          <WebGLShader fixed={false} />
+        </Suspense>
+        <div className="host-cta-scrim" />
+        <div className="host-cta-inner">
+          <span className="badge">Got a place?</span>
+          <h2>List your sublet in minutes.</h2>
+          <p>
+            Reach thousands of verified Longhorns looking for a short-term place near campus.
+            Free to post, always.
+          </p>
+          <LiquidButton
+            size="xl"
+            className="text-white border border-white/30 rounded-full"
+            onClick={() => navigate("/sublets/new")}
+          >
+            Post a Listing
+          </LiquidButton>
+        </div>
+      </section>
+
       {/* ── BLOGS ── */}
       <section id="blogs" className="blogs">
         <h2 className="blogs-title">Tips &amp; Guides</h2>
@@ -183,7 +213,7 @@ export default function Home() {
                 Everything from vetting roommates to splitting deposits — a practical
                 walkthrough so your next sublet goes smoothly.
               </p>
-              <span className="blog-date">📅 Jul 25, 2026</span>
+              <span className="blog-date"><CalendarIcon width={13} height={13} /> Jul 25, 2026</span>
             </div>
           </article>
 
@@ -197,7 +227,7 @@ export default function Home() {
                 />
                 <div className="blog-item-body">
                   <h4>{b.title}</h4>
-                  <span className="blog-date">📅 {b.date}</span>
+                  <span className="blog-date"><CalendarIcon width={13} height={13} /> {b.date}</span>
                 </div>
               </article>
             ))}

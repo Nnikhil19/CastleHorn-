@@ -1,33 +1,68 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --orange: #BF5700;
-  --orange-dark: #9e4700;
-  --orange-light: #f07030;
-  --dark: #0f0f0f;
-  --dark2: #1a1a1a;
-  --dark3: #242424;
-  --gray: #888;
-  --gray-light: #ccc;
+  --orange: #ff6a13;
+  --orange-dark: #BF5700;
+  --orange-light: #ff8a47;
+  --orange-glow: rgba(255, 106, 19, 0.45);
+  --dark: #0a0a0b;
+  --dark2: #141416;
+  --dark3: #1e1e21;
+  --gray: #8a8a93;
+  --gray-light: #c9c9d2;
   --white: #fff;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  --transition: 0.2s ease;
+  --radius-lg: 20px;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 10px 40px rgba(0,0,0,0.45);
+  --glass: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.10);
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   background: var(--dark);
   color: var(--white);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6, .nav-brand, .auth-logo, .sub-brand, .footer-brand {
+  font-family: var(--font-heading);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* shared glass surface */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; font-family: inherit; }
+
+/* visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
 /* ── Buttons ── */
 .btn {
@@ -43,8 +78,12 @@ button { cursor: pointer; font-family: inherit; }
   transition: var(--transition);
   white-space: nowrap;
 }
-.btn-primary { background: var(--orange); color: var(--white); }
-.btn-primary:hover { background: var(--orange-light); transform: translateY(-1px); }
+.btn-primary {
+  background: linear-gradient(180deg, var(--orange-light), var(--orange));
+  color: var(--white);
+  box-shadow: 0 6px 20px var(--orange-glow);
+}
+.btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 10px 28px var(--orange-glow); }
 
 .btn-ghost {
   background: transparent;

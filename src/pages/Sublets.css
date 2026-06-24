@@ -159,7 +159,8 @@
 
 .sub-card-main { flex: 1; min-width: 0; }
 .sub-card-main h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
-.sub-meta { font-size: 13px; color: var(--gray-light); margin-bottom: 4px; }
+.sub-meta { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gray-light); margin-bottom: 4px; }
+.sub-meta svg { color: var(--orange-light); flex-shrink: 0; }
 .sub-desc { font-size: 14px; color: var(--gray-light); margin: 10px 0; line-height: 1.6; }
 .sub-postedby { font-size: 12px; color: var(--gray); }
 
@@ -257,7 +258,8 @@
   gap: 4px;
 }
 .ld-fact-label { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; }
-.ld-fact-value { font-size: 15px; color: #fff; font-weight: 600; }
+.ld-fact-value { display: flex; align-items: center; gap: 7px; font-size: 15px; color: #fff; font-weight: 600; }
+.ld-fact-value svg { color: var(--orange-light); flex-shrink: 0; }
 
 .ld-section { margin-bottom: 28px; }
 .ld-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }

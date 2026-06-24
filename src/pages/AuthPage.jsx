@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
@@ -8,7 +8,13 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase";
+import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import "./AuthPage.css";
+
+// Lazy so three.js loads as its own chunk only on this page.
+const WebGLShader = lazy(() =>
+  import("@/components/ui/web-gl-shader").then((m) => ({ default: m.WebGLShader }))
+);
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -16,6 +22,12 @@ const GoogleIcon = () => (
     <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
     <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332Z" fill="#FBBC05"/>
     <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+  </svg>
+);
+
+const BackIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 12H5M12 19l-7-7 7-7" />
   </svg>
 );
 
@@ -88,9 +100,15 @@ export default function AuthPage() {
   /* ── Main auth form ── */
   return (
     <div className="auth-page">
-      <Link to="/" className="auth-back">← Back to CastleHorn</Link>
+      {/* Living shader backdrop */}
+      <Suspense fallback={null}>
+        <WebGLShader />
+      </Suspense>
+      <div className="auth-scrim" />
 
-      <div className="auth-card">
+      <Link to="/" className="auth-back"><BackIcon /> Back to CastleHorn</Link>
+
+      <div className="auth-card glass">
         {/* Logo */}
         <div className="auth-logo">Castle<span>Horn</span></div>
 
@@ -176,11 +194,16 @@ export default function AuthPage() {
 
           {error && <p className="auth-error">{error}</p>}
 
-          <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
+          <LiquidButton
+            type="submit"
+            size="xl"
+            disabled={loading}
+            className="auth-submit text-white border border-white/30 rounded-full w-full"
+          >
             {loading
               ? "Please wait…"
               : mode === "login" ? "Log In" : "Create Account"}
-          </button>
+          </LiquidButton>
         </form>
 
         <p className="auth-switch">

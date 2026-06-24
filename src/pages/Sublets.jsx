@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getListings, listingImage, listingImageFallback, TERM_LABELS, FEATURE_LABELS } from "../lib/listings";
+import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import { CalendarIcon, TagIcon } from "../components/icons";
 import "./Sublets.css";
 
 export default function Sublets() {
@@ -48,7 +50,13 @@ export default function Sublets() {
         {/* ── Sidebar ── */}
         <aside className="sub-sidebar">
           <div className="sub-panel">
-            <Link to="/sublets/new" className="sub-btn sub-btn-link">+ Create a Listing</Link>
+            <LiquidButton
+              size="xl"
+              className="text-white border border-white/30 rounded-full w-full"
+              onClick={() => navigate("/sublets/new")}
+            >
+              + Create a Listing
+            </LiquidButton>
           </div>
 
           <div className="sub-panel">
@@ -104,8 +112,8 @@ export default function Sublets() {
                   onError={(e) => { e.currentTarget.src = listingImageFallback(item); }} />
                 <div className="sub-card-main">
                   <h3>{item.title}</h3>
-                  <p className="sub-meta">📅 {item.dates}</p>
-                  <p className="sub-meta">🏷️ {TERM_LABELS[item.term] ?? item.term}</p>
+                  <p className="sub-meta"><CalendarIcon width={14} height={14} /> {item.dates}</p>
+                  <p className="sub-meta"><TagIcon width={14} height={14} /> {TERM_LABELS[item.term] ?? item.term}</p>
                   {item.features?.length > 0 && (
                     <div className="sub-tags">
                       {item.features.map((f) => (
