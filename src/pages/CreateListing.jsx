@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { addListing } from "../lib/listings";
+import { addListing, FEATURE_LABELS } from "../lib/listings";
 import "./Sublets.css";
 
 const formatDate = (iso) => {
@@ -16,10 +16,13 @@ export default function CreateListing() {
   const [form, setForm] = useState({
     title: "", startDate: "", endDate: "", term: "weeks", price: "", unit: "per stay", desc: "", name: "",
   });
+  const [features, setFeatures] = useState([]);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const toggleFeature = (f) =>
+    setFeatures((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,6 +43,7 @@ export default function CreateListing() {
         title: form.title,
         dates: `${formatDate(form.startDate)} – ${formatDate(form.endDate)}`,
         term: form.term,
+        features,
         price,
         priceUnit: form.unit,
         desc: form.desc,
@@ -91,6 +95,20 @@ export default function CreateListing() {
               <option value="summer">Summer (May–Aug)</option>
               <option value="winter">Winter (Dec–Jan)</option>
             </select>
+
+            <label>Traits (select all that apply)</label>
+            <div className="sub-checks">
+              {Object.entries(FEATURE_LABELS).map(([value, label]) => (
+                <label key={value} className="sub-check">
+                  <input
+                    type="checkbox"
+                    checked={features.includes(value)}
+                    onChange={() => toggleFeature(value)}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
 
             <label htmlFor="new-price">Price ($)</label>
             <input id="new-price" type="number" required placeholder="e.g. 650"

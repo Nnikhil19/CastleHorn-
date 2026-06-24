@@ -146,12 +146,55 @@
   transition: border-color 0.18s, transform 0.18s;
 }
 .sub-card:hover { border-color: rgba(191,87,0,0.4); transform: translateY(-2px); }
+.sub-card-clickable { cursor: pointer; }
+
+.sub-card-img {
+  flex: 0 0 200px;
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--dark3);
+}
 
 .sub-card-main { flex: 1; min-width: 0; }
 .sub-card-main h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
 .sub-meta { font-size: 13px; color: var(--gray-light); margin-bottom: 4px; }
 .sub-desc { font-size: 14px; color: var(--gray-light); margin: 10px 0; line-height: 1.6; }
 .sub-postedby { font-size: 12px; color: var(--gray); }
+
+/* trait tags */
+.sub-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; }
+.sub-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--orange-light);
+  background: rgba(191,87,0,0.14);
+  border: 1px solid rgba(191,87,0,0.3);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+/* checkbox groups (filter + create form) */
+.sub-checks { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.sub-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--gray-light);
+  cursor: pointer;
+  margin: 0;
+}
+.sub-check input {
+  width: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  accent-color: var(--orange);
+  margin: 0;
+  cursor: pointer;
+}
 
 .sub-card-price {
   flex: 0 0 130px;
@@ -163,9 +206,71 @@
 .sub-price { font-size: 22px; font-weight: 800; color: var(--orange); letter-spacing: -0.5px; }
 .sub-priceunit { font-size: 12px; color: var(--gray); margin-top: 2px; }
 
+/* ── listing detail (full-screen view) ── */
+.ld-status { max-width: 600px; margin: 60px auto; }
+.ld-notfound-btn { display: inline-block; margin-top: 16px; max-width: 220px; }
+
+.ld-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 5% 64px;
+}
+
+.ld-hero { position: relative; margin-bottom: 28px; }
+.ld-img {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--dark3);
+}
+.ld-price-badge {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: var(--orange);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+}
+.ld-price-badge span { font-size: 13px; font-weight: 600; opacity: 0.9; }
+
+.ld-title { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+.ld-postedby { font-size: 14px; color: var(--gray); margin-bottom: 28px; }
+
+.ld-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.ld-fact {
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ld-fact-label { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; }
+.ld-fact-value { font-size: 15px; color: #fff; font-weight: 600; }
+
+.ld-section { margin-bottom: 28px; }
+.ld-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+.ld-desc { font-size: 15px; color: var(--gray-light); line-height: 1.75; }
+
+.ld-back-btn { display: inline-block; max-width: 260px; }
+
 @media (max-width: 860px) {
   .sub-layout { flex-direction: column; }
   .sub-sidebar { flex: none; width: 100%; position: static; }
   .sub-card { flex-direction: column; }
+  .sub-card-img { flex: none; width: 100%; height: 180px; }
   .sub-card-price { flex-direction: row; align-items: baseline; gap: 8px; text-align: left; }
+  .ld-img { height: 240px; }
+  .ld-title { font-size: 26px; }
 }

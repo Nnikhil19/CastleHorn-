@@ -16,6 +16,21 @@ export const TERM_LABELS = {
   winter: "Winter (Dec–Jan)",
 };
 
+export const FEATURE_LABELS = {
+  cleanliness: "Cleanliness",
+  communication: "Communication",
+  cheap: "Cheap Rent",
+  maintenance: "Good Maintenance",
+  security: "Security / Trust",
+};
+
+// Deterministic placeholder image per listing (so each card looks distinct).
+export function listingImage(listing) {
+  if (listing.image) return listing.image;
+  const seed = encodeURIComponent(String(listing.id ?? listing.title ?? "castlehorn"));
+  return `https://picsum.photos/seed/${seed}/800/500`;
+}
+
 // Static demo listings shown beneath any user-created ones.
 const SEED_LISTINGS = [
   {
@@ -23,9 +38,10 @@ const SEED_LISTINGS = [
     title: "Apartment Room",
     dates: "Dec 15, 2026 – Jan 08, 2027",
     term: "weeks",
+    features: ["cleanliness", "communication"],
     price: 650,
     priceUnit: "per stay",
-    desc: "One bedroom and private bathroom available while I am away for winter break.",
+    desc: "One bedroom and private bathroom available while I am away for winter break. Looking for a clean, quiet, and considerate roommate.",
     postedBy: "Sarah M.",
   },
   {
@@ -33,9 +49,10 @@ const SEED_LISTINGS = [
     title: "High-Rise Room",
     dates: "Jun 01, 2026 – Aug 12, 2026",
     term: "summer",
+    features: ["cheap", "communication"],
     price: 850,
     priceUnit: "per month",
-    desc: "One bedroom available for the summer. The other roommates are UT students.",
+    desc: "One bedroom available for the summer. Perfect balance of affordability and quality. The other roommates are UT students.",
     postedBy: "Alex R.",
   },
   {
@@ -43,10 +60,22 @@ const SEED_LISTINGS = [
     title: "Condo Room",
     dates: "May 25, 2026 – Jul 31, 2026",
     term: "summer",
+    features: ["cleanliness", "maintenance"],
     price: 720,
     priceUnit: "per month",
-    desc: "Large private bedroom available for the summer. Located right next to the UT bus stop.",
+    desc: "Large private bedroom available for the summer. Well built unit with few maintenance problems. Located right next to the UT bus stop.",
     postedBy: "Jordan K.",
+  },
+  {
+    id: "seed-4",
+    title: "Co-op Shared Space",
+    dates: "Jan 10, 2026 – May 15, 2026",
+    term: "winter",
+    features: ["communication", "security"],
+    price: 500,
+    priceUnit: "per month",
+    desc: "Great community environment. Focus on strong communication, respect for boundaries, and mutual trust.",
+    postedBy: "Taylor P.",
   },
 ];
 
@@ -61,6 +90,12 @@ export async function getListings() {
     console.error("Failed to load listings from Firestore:", err);
     return SEED_LISTINGS;
   }
+}
+
+// Look up a single listing by id (Firestore doc id or seed id).
+export async function getListingById(id) {
+  const all = await getListings();
+  return all.find((l) => String(l.id) === String(id)) ?? null;
 }
 
 // Persist a new listing to Firestore so every user sees it.
