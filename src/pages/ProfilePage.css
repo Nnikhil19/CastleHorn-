@@ -1,0 +1,147 @@
+.pp-page {
+  min-height: 100vh;
+  background: var(--cream);
+}
+
+.pp-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 5% 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Profile card ── */
+.pp-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: var(--cream-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.pp-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #FFF7EC;
+  font: 800 26px/1 var(--font-heading);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pp-identity { flex: 1; min-width: 0; }
+
+.pp-name {
+  font: 800 24px/1.1 var(--font-heading);
+  color: var(--dark);
+  margin: 0 0 4px;
+  letter-spacing: -0.4px;
+}
+.pp-username {
+  font: 600 14px/1 var(--font-body);
+  color: var(--orange);
+  margin: 0 0 10px;
+}
+.pp-meta {
+  font: 400 13px/1 var(--font-body);
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+}
+.pp-dot { color: var(--faint); }
+
+/* ── Sections ── */
+.pp-section {
+  background: var(--cream-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+}
+
+.pp-section-title {
+  font: 700 14px/1 var(--font-heading);
+  color: var(--dark);
+  margin: 0 0 16px;
+}
+
+.pp-bio {
+  font: 400 16px/1.7 var(--font-body);
+  color: var(--mid);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Habits ── */
+.pp-habits {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pp-habit-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--cream-warm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.pp-habit-icon { font-size: 20px; flex-shrink: 0; }
+
+.pp-habit-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pp-habit-label {
+  font: 600 12px/1 var(--font-body);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pp-habit-value { font: 700 14px/1 var(--font-body); color: var(--dark); }
+
+/* ── Contact ── */
+.pp-email { font: 600 15px/1 var(--font-body); color: var(--orange); }
+.pp-email:hover { text-decoration: underline; }
+
+/* ── Not found ── */
+.pp-not-found {
+  max-width: 400px;
+  margin: 80px auto;
+  text-align: center;
+  color: var(--muted);
+  font: 400 16px/1.5 var(--font-body);
+}
+.pp-back-btn {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 13px 26px;
+  background: var(--orange);
+  color: #FFF7EC;
+  border-radius: 999px;
+  font: 700 14px/1 var(--font-body);
+}
+.pp-back-btn:hover { background: var(--orange-dark); }
+
+@media (max-width: 480px) {
+  .pp-card { flex-direction: column; text-align: center; }
+  .pp-meta { justify-content: center; }
+}
