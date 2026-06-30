@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
@@ -8,13 +8,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import "./AuthPage.css";
-
-// Lazy so three.js loads as its own chunk only on this page.
-const WebGLShader = lazy(() =>
-  import("@/components/ui/web-gl-shader").then((m) => ({ default: m.WebGLShader }))
-);
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -25,15 +19,9 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const BackIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 12H5M12 19l-7-7 7-7" />
-  </svg>
-);
-
 export default function AuthPage() {
   const [params] = useSearchParams();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
   const [mode, setMode]         = useState(params.get("mode") === "register" ? "register" : "login");
   const [name, setName]         = useState("");
   const [email, setEmail]       = useState("");
@@ -41,7 +29,6 @@ export default function AuthPage() {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState("");
 
-  // redirect if already signed in (and verified)
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user && user.emailVerified) navigate("/");
@@ -97,121 +84,84 @@ export default function AuthPage() {
     }
   };
 
-  /* ── Main auth form ── */
   return (
     <div className="auth-page">
-      {/* Living shader backdrop */}
-      <Suspense fallback={null}>
-        <WebGLShader />
-      </Suspense>
-      <div className="auth-scrim" />
+      {/* Animated blob background */}
+      <div className="auth-blobs">
+        <div className="auth-blob-a" />
+        <div className="auth-blob-b" />
+        <div className="auth-blob-c" />
+      </div>
 
-      <Link to="/" className="auth-back"><BackIcon /> Back to CastleHorn</Link>
+      <Link to="/" className="auth-back">← Back to CastleHorn</Link>
 
-      <div className="auth-card glass">
-        {/* Logo */}
+      <div className="auth-card">
         <div className="auth-logo">Castle<span>Horn</span></div>
 
-        {/* Tabs */}
         <div className="auth-tabs">
-          <button
-            className={`auth-tab ${mode === "login" ? "active" : ""}`}
-            onClick={() => { setMode("login"); clearError(); }}
-          >
-            Log In
+          <button className={`auth-tab ${mode === "login" ? "active" : ""}`}
+            onClick={() => { setMode("login"); clearError(); }}>
+            Log in
           </button>
-          <button
-            className={`auth-tab ${mode === "register" ? "active" : ""}`}
-            onClick={() => { setMode("register"); clearError(); }}
-          >
-            Sign Up
+          <button className={`auth-tab ${mode === "register" ? "active" : ""}`}
+            onClick={() => { setMode("register"); clearError(); }}>
+            Sign up
           </button>
         </div>
 
         <h2 className="auth-title">
-          {mode === "login" ? "Welcome back" : "Create your account"}
+          {mode === "login" ? "Welcome back" : "Make an account"}
         </h2>
         <p className="auth-sub">
           {mode === "login"
-            ? "Log in to access your CastleHorn resources."
-            : "Join thousands of UT students — it's free."}
+            ? "Log in to message hosts and post your place."
+            : "It's free, and it takes about a minute."}
         </p>
 
-        {/* Google */}
         <button className="google-btn" onClick={handleGoogle} disabled={loading}>
           <GoogleIcon />
           Continue with Google
         </button>
 
-        <div className="divider"><span>or</span></div>
+        <div className="divider"><span>or use your UT email</span></div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} noValidate>
           {mode === "register" && (
             <div className="field">
-              <label htmlFor="auth-name">Full Name</label>
-              <input
-                id="auth-name"
-                type="text"
-                placeholder="Jane Longhorn"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                autoComplete="name"
-              />
+              <label htmlFor="auth-name">Full name</label>
+              <input id="auth-name" type="text" placeholder="Jane Longhorn"
+                value={name} onChange={(e) => setName(e.target.value)}
+                required autoComplete="name" />
             </div>
           )}
-
           <div className="field">
             <label htmlFor="auth-email">Email</label>
-            <input
-              id="auth-email"
-              type="email"
-              placeholder="you@utexas.edu"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
+            <input id="auth-email" type="email" placeholder="you@utexas.edu"
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              required autoComplete="email" />
           </div>
-
           <div className="field">
             <label htmlFor="auth-password">
               Password
               {mode === "register" && <span className="hint"> (min 6 characters)</span>}
             </label>
-            <input
-              id="auth-password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              autoComplete={mode === "register" ? "new-password" : "current-password"}
-            />
+            <input id="auth-password" type="password" placeholder="••••••••"
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              required minLength={6}
+              autoComplete={mode === "register" ? "new-password" : "current-password"} />
           </div>
 
           {error && <p className="auth-error">{error}</p>}
 
-          <LiquidButton
-            type="submit"
-            size="xl"
-            disabled={loading}
-            className="auth-submit text-white border border-white/30 rounded-full w-full"
-          >
-            {loading
-              ? "Please wait…"
-              : mode === "login" ? "Log In" : "Create Account"}
-          </LiquidButton>
+          <button type="submit" className="auth-submit" disabled={loading}>
+            {loading ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
+          </button>
         </form>
 
         <p className="auth-switch">
-          {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
-          <button
-            className="link-btn"
-            onClick={() => { setMode(mode === "login" ? "register" : "login"); clearError(); }}
-          >
+          {mode === "login" ? "New here?" : "Already have an account?"}{" "}
+          <button className="link-btn"
+            onClick={() => { setMode(mode === "login" ? "register" : "login"); clearError(); }}>
             {mode === "login" ? "Sign up" : "Log in"}
           </button>
         </p>

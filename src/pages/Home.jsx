@@ -1,29 +1,34 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { getListings, listingImage, listingImageFallback, TERM_LABELS } from "../lib/listings";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
-import { SearchIcon, CalendarIcon } from "../components/icons";
+import { SearchIcon } from "../components/icons";
 import "./Home.css";
 
-// Lazy so three.js is split into its own chunk, loaded only when the band renders.
-const WebGLShader = lazy(() =>
-  import("@/components/ui/web-gl-shader").then((m) => ({ default: m.WebGLShader }))
-);
-
 const CATEGORIES = [
-  { value: "all", label: "All categories" },
-  { value: "weeks", label: "1–3 Weeks" },
+  { value: "all",    label: "All" },
+  { value: "weeks",  label: "1–3 Weeks" },
   { value: "summer", label: "Summer" },
-  { value: "winter", label: "Winter" },
+  { value: "winter", label: "Semester" },
+];
+
+const MARQUEE_ITEMS = [
+  "No broker fees", "UT email verified", "Real students, real rooms", "Free to post",
+  "No broker fees", "UT email verified", "Real students, real rooms", "Free to post",
+];
+
+const HOW_STEPS = [
+  { n: "1", t: "Find your match", d: "Filter by term, neighborhood, and budget until you spot a room that actually fits your semester." },
+  { n: "2", t: "Message the student", d: "Talk to the person who lives there. Ask the awkward questions before you commit to anything." },
+  { n: "3", t: "Move in, no fuss", d: "Sort out dates and the handoff directly. No agents, no application fees, no surprises." },
 ];
 
 const BLOGS = [
-  { title: "How to spot a trustworthy sublet near UT", date: "Jul 25, 2026" },
-  { title: "Subleasing 101: what every Longhorn should know", date: "Jul 25, 2026" },
-  { title: "Best West Campus neighborhoods for students", date: "Jul 25, 2026" },
-  { title: "Splitting rent & utilities the fair way", date: "Jul 25, 2026" },
+  { title: "How to tell a real sublet from a scam in 30 seconds", date: "Jul 25, 2026" },
+  { title: "Subleasing 101 for first-time Longhorns", date: "Jul 22, 2026" },
+  { title: "Which West Campus blocks are actually worth it", date: "Jul 18, 2026" },
+  { title: "Splitting rent and utilities without the drama", date: "Jul 14, 2026" },
 ];
 
 function RoomCard({ item, onClick }) {
@@ -31,13 +36,11 @@ function RoomCard({ item, onClick }) {
     <div className="room-card" onClick={onClick} role="button" tabIndex={0}
       onKeyDown={(e) => { if (e.key === "Enter") onClick(); }}>
       <div className="room-card-imgwrap">
-        <img
-          className="room-card-img"
-          src={listingImage(item)}
-          alt={item.title}
-          loading="lazy"
-          onError={(e) => { e.currentTarget.src = listingImageFallback(item); }}
-        />
+        <img className="room-card-img" src={listingImage(item)} alt={item.title} loading="lazy"
+          onError={(e) => { e.currentTarget.src = listingImageFallback(item); }} />
+        {item.term && (
+          <span className="room-card-term">{TERM_LABELS[item.term] ?? item.term}</span>
+        )}
       </div>
       <div className="room-card-body">
         <div className="room-card-row">
@@ -58,14 +61,6 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [listings, setListings] = useState([]);
   const [category, setCategory] = useState("all");
-
-  const goRegister = () => navigate("/auth?mode=register");
-  const goLogin    = () => navigate("/auth?mode=login");
-  const handleLogout = () => signOut(auth);
-  const scrollTo = (id) => (e) => {
-    e.preventDefault();
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, setUser);
@@ -88,77 +83,109 @@ export default function Home() {
 
       {/* ── NAV ── */}
       <nav className="nav">
-        <div className="nav-brand">Castle<span>Horn</span></div>
+        <button className="nav-brand" onClick={() => navigate("/")}>
+          <span className="nav-brand-icon">C</span>
+          <span className="nav-brand-text">Castle<span>Horn</span></span>
+        </button>
         <ul className="nav-links">
-          <li><a href="#home" onClick={scrollTo("home")}>Home</a></li>
-          <li><a href="#rooms" onClick={scrollTo("rooms")}>Rooms</a></li>
-          <li><a href="#blogs" onClick={scrollTo("blogs")}>Blogs</a></li>
-          <li><a href="#about" onClick={scrollTo("about")}>About</a></li>
+          <li><button onClick={() => navigate("/")}>Home</button></li>
+          <li><button onClick={() => navigate("/sublets")}>Browse</button></li>
+          <li><button onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}>How it works</button></li>
         </ul>
         <div className="nav-auth">
           {user ? (
             <>
               <span className="nav-user">Hi, {user.email?.split("@")[0]}</span>
-              <button className="btn btn-ghost" onClick={handleLogout}>Log Out</button>
+              <button className="nav-logout" onClick={() => signOut(auth)}>Log out</button>
             </>
           ) : (
             <>
-              <button className="btn btn-ghost" onClick={goLogin}>Log In</button>
-              <button className="btn btn-primary" onClick={goRegister}>Sign Up</button>
+              <button className="nav-login" onClick={() => navigate("/auth?mode=login")}>Log in</button>
+              <button className="nav-signup" onClick={() => navigate("/auth?mode=register")}>Sign up</button>
             </>
           )}
         </div>
       </nav>
 
       {/* ── HERO ── */}
-      <section className="hero" id="home">
-        <div className="hero-overlay" />
-        <div className="hero-inner">
-          <h1>Experience Unforgettable Stays<br />Near UT Austin</h1>
-          <p className="hero-sub">
-            Discover student-vetted sublets tailored just for you — whether it's a
-            semester away, a summer internship, or winter break.
-          </p>
-
-          <div className="search-bar">
-            <div className="search-field">
-              <label>Where</label>
-              <input type="text" placeholder="Add destination" id="search-where" />
-            </div>
-            <div className="search-field">
-              <label>Check in</label>
-              <input type="date" id="search-in" />
-            </div>
-            <div className="search-field">
-              <label>Check out</label>
-              <input type="date" id="search-out" />
-            </div>
-            <div className="search-field">
-              <label>Who</label>
-              <input type="text" placeholder="Add guests" id="search-who" />
-            </div>
-            <button className="search-btn" onClick={() => navigate("/sublets")} aria-label="Search">
-              <SearchIcon width={18} height={18} />
-            </button>
+      <section className="hero">
+        <div className="hero-badge">
+          <span className="hero-badge-dot" />
+          <span>Built by City of Austin interns · free to post</span>
+        </div>
+        <h1>
+          Sublets near campus,{" "}
+          <span className="hero-italic">minus the stress.</span>
+        </h1>
+        <p className="hero-sub">
+          Summer, winter-break, and a-few-weeks stays, posted by other Longhorns. No brokers,
+          no fees, no Craigslist guessing games — just students handing off a room they already love.
+        </p>
+        <div className="search-bar">
+          <div className="search-field">
+            <label>Where</label>
+            <input placeholder="West Campus, Hyde Park…" />
           </div>
+          <div className="search-field">
+            <label>Move in</label>
+            <input type="date" />
+          </div>
+          <div className="search-field">
+            <label>Move out</label>
+            <input type="date" />
+          </div>
+          <button className="search-btn" onClick={() => navigate("/sublets")}>
+            <SearchIcon width={17} height={17} />
+            Search
+          </button>
         </div>
       </section>
 
-      {/* ── EXPLORE ROOMS ── */}
-      <section id="rooms" className="rooms">
-        <h2 className="rooms-title">Explore Available Sublets</h2>
+      {/* ── TRUST MARQUEE ── */}
+      <div className="marquee-strip">
+        <div className="marquee-inner">
+          {MARQUEE_ITEMS.map((t, i) => (
+            <span key={i} className="marquee-item">
+              <span className="marquee-item-star">✦</span> {t}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── HOW IT WORKS ── */}
+      <section className="how-section" id="how">
+        <div className="how-header">
+          <div>
+            <p className="how-eyebrow">How it works</p>
+            <h2>Three steps. No paperwork, no middlemen.</h2>
+          </div>
+        </div>
+        <div className="how-grid">
+          {HOW_STEPS.map((s) => (
+            <div className="how-card" key={s.n}>
+              <span className="how-num">{s.n}</span>
+              <h3>{s.t}</h3>
+              <p>{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── LISTINGS ── */}
+      <section className="rooms">
+        <div className="rooms-header">
+          <h2>Open right now</h2>
+          <button className="rooms-see-all" onClick={() => navigate("/sublets")}>See all listings →</button>
+        </div>
         <div className="cat-tabs">
           {CATEGORIES.map((c) => (
-            <button
-              key={c.value}
+            <button key={c.value}
               className={`cat-tab ${category === c.value ? "active" : ""}`}
-              onClick={() => setCategory(c.value)}
-            >
+              onClick={() => setCategory(c.value)}>
               {c.label}
             </button>
           ))}
         </div>
-
         <div className="rooms-grid">
           {shown.length === 0 ? (
             <p className="rooms-empty">No sublets in this category yet.</p>
@@ -168,66 +195,52 @@ export default function Home() {
             ))
           )}
         </div>
-
-        <div className="rooms-cta">
-          <Link to="/sublets" className="btn btn-ghost btn-lg">View all listings</Link>
-        </div>
       </section>
 
-      {/* ── HOST CTA (live shader band) ── */}
+      {/* ── HOST CTA ── */}
       <section className="host-cta">
-        <Suspense fallback={null}>
-          <WebGLShader fixed={false} />
-        </Suspense>
-        <div className="host-cta-scrim" />
         <div className="host-cta-inner">
-          <span className="badge">Got a place?</span>
-          <h2>List your sublet in minutes.</h2>
-          <p>
-            Reach thousands of verified Longhorns looking for a short-term place near campus.
-            Free to post, always.
-          </p>
-          <LiquidButton
-            size="xl"
-            className="text-white border border-white/30 rounded-full"
-            onClick={() => navigate("/sublets/new")}
-          >
-            Post a Listing
-          </LiquidButton>
+          <div className="host-cta-blobs">
+            <div className="host-cta-blob-a" />
+            <div className="host-cta-blob-b" />
+            <div className="host-cta-blob-c" />
+          </div>
+          <div className="host-cta-scrim" />
+          <div className="host-cta-content">
+            <span className="host-cta-badge">Got a place sitting empty?</span>
+            <h2>List it in about five minutes.</h2>
+            <p>
+              Heading home for the summer or studying abroad? Put your room in front of Longhorns
+              who actually need it. Posting is free, and you pick who you hand the keys to.
+            </p>
+            <button className="host-cta-btn" onClick={() => navigate("/auth?mode=register")}>
+              Post a listing →
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* ── BLOGS ── */}
-      <section id="blogs" className="blogs">
-        <h2 className="blogs-title">Tips &amp; Guides</h2>
+      {/* ── TIPS ── */}
+      <section className="blogs">
+        <h2 className="blogs-title">Figure it out faster</h2>
         <div className="blogs-grid">
           <article className="blog-feature">
-            <img
-              src={listingImage({ id: "blog-hero" })}
-              alt=""
-              onError={(e) => { e.currentTarget.src = listingImageFallback({ id: "blog-hero" }); }}
-            />
+            <img src={listingImage({ id: "blog-hero" })} alt=""
+              onError={(e) => { e.currentTarget.src = listingImageFallback({ id: "blog-hero" }); }} />
             <div className="blog-feature-body">
-              <h3>The complete guide to subleasing as a UT student</h3>
-              <p>
-                Everything from vetting roommates to splitting deposits — a practical
-                walkthrough so your next sublet goes smoothly.
-              </p>
-              <span className="blog-date"><CalendarIcon width={13} height={13} /> Jul 25, 2026</span>
+              <span className="blog-eyebrow">Guide</span>
+              <h3>The whole subleasing thing, explained without the legalese</h3>
+              <p>From sniffing out roommates to splitting the deposit fairly — the stuff nobody tells you until you've already signed.</p>
             </div>
           </article>
-
           <div className="blog-list">
             {BLOGS.map((b, i) => (
               <article className="blog-item" key={b.title}>
-                <img
-                  src={listingImage({ id: `blog-${i}` })}
-                  alt=""
-                  onError={(e) => { e.currentTarget.src = listingImageFallback({ id: `blog-${i}` }); }}
-                />
+                <img src={listingImage({ id: `blog-${i}` })} alt=""
+                  onError={(e) => { e.currentTarget.src = listingImageFallback({ id: `blog-${i}` }); }} />
                 <div className="blog-item-body">
                   <h4>{b.title}</h4>
-                  <span className="blog-date"><CalendarIcon width={13} height={13} /> {b.date}</span>
+                  <span className="blog-date">{b.date}</span>
                 </div>
               </article>
             ))}
@@ -236,20 +249,24 @@ export default function Home() {
       </section>
 
       {/* ── ABOUT ── */}
-      <section id="about" className="about">
+      <section className="about" id="about">
         <div className="about-text">
-          <span className="badge">About CastleHorn</span>
-          <h2>Built by Interns, for Students</h2>
+          <span className="about-eyebrow">About CastleHorn</span>
+          <h2>We made the thing we wish we'd had.</h2>
           <p>
-            CastleHorn is a project by <strong>City of Austin interns</strong> who were once
-            in your shoes. We built the resource we wish we had — a single platform that bridges
-            UT campus life with the broader Austin community.
+            CastleHorn started as a side project among{" "}
+            <strong>City of Austin interns</strong> who'd all been burned by the summer-sublet
+            scramble at least once. We wanted one honest place to find a room near UT — without
+            the spam DMs and ghost listings.
           </p>
           <p>
-            Our team spans engineering, design, and public policy, all united by one goal:
-            make Austin more accessible for every Longhorn.
+            We're engineers, designers, and policy nerds who think finding a place to crash in
+            Austin shouldn't be this hard. So we're fixing it, one listing at a time.
           </p>
-          <button className="btn btn-primary" onClick={goRegister}>Join the Community</button>
+          <button className="btn btn-dark" style={{ marginTop: 12 }}
+            onClick={() => navigate("/auth?mode=register")}>
+            Join the community
+          </button>
         </div>
         <div className="about-photos">
           <img className="about-photo p1" src={listingImage({ id: "about-1" })} alt=""
@@ -262,33 +279,34 @@ export default function Home() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer id="contact" className="footer">
+      <footer className="footer">
         <div className="footer-cols">
           <div className="footer-brand-col">
             <div className="footer-brand">Castle<span>Horn</span></div>
-            <p>A City of Austin Intern Project — made with ♥ for UT students.</p>
+            <p>A City of Austin intern project. Made for Longhorns, by Longhorns who've slept on enough air mattresses.</p>
           </div>
           <div className="footer-col">
-            <h4>Programs</h4>
-            <a href="#rooms" onClick={scrollTo("rooms")}>Browse Sublets</a>
-            <Link to="/sublets/new">Post a Listing</Link>
-            <Link to="/auth?mode=register">Create Account</Link>
+            <h4>Get a place</h4>
+            <button onClick={() => navigate("/sublets")}>Browse sublets</button>
+            <button onClick={() => navigate("/auth?mode=register")}>Post a listing</button>
+            <button onClick={() => navigate("/auth?mode=register")}>Create account</button>
           </div>
           <div className="footer-col">
-            <h4>Help &amp; Support</h4>
-            <a href="#blogs" onClick={scrollTo("blogs")}>Tips &amp; Guides</a>
-            <a href="mailto:nikhilsyt.2010@gmail.com">Contact Us</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>Terms &amp; Privacy</a>
+            <h4>Help</h4>
+            <button onClick={() => {}}>Tips &amp; guides</button>
+            <button onClick={() => {}}>Contact us</button>
+            <button onClick={() => {}}>Terms &amp; privacy</button>
           </div>
           <div className="footer-col">
-            <h4>Follow Us</h4>
-            <a href="#" onClick={(e) => e.preventDefault()}>Instagram</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>Twitter / X</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>YouTube</a>
+            <h4>Follow</h4>
+            <button onClick={() => {}}>Instagram</button>
+            <button onClick={() => {}}>Twitter / X</button>
+            <button onClick={() => {}}>YouTube</button>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2026 CastleHorn. Hook 'Em! 🤘</p>
+          <span>© 2026 CastleHorn</span>
+          <span>Hook 'em 🤘</span>
         </div>
       </footer>
 

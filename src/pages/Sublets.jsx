@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getListings, listingImage, listingImageFallback, TERM_LABELS, FEATURE_LABELS } from "../lib/listings";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
-import { CalendarIcon, TagIcon } from "../components/icons";
 import "./Sublets.css";
+
+const TERM_OPTS = [
+  { value: "all",    label: "All short-term" },
+  { value: "weeks",  label: "1–3 Weeks" },
+  { value: "summer", label: "Summer (May–Aug)" },
+  { value: "winter", label: "Semester" },
+];
 
 export default function Sublets() {
   const navigate = useNavigate();
@@ -42,78 +47,82 @@ export default function Sublets() {
   return (
     <div className="sub-page">
       <nav className="sub-nav">
-        <Link to="/" className="sub-brand">Castle<span>Horn</span></Link>
+        <Link to="/" className="sub-brand">
+          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-text">Castle<span>Horn</span></span>
+        </Link>
         <Link to="/" className="sub-back">← Back home</Link>
       </nav>
 
       <div className="sub-layout">
         {/* ── Sidebar ── */}
         <aside className="sub-sidebar">
+          <button className="sub-post-btn" onClick={() => navigate("/sublets/new")}>
+            + Post your place
+          </button>
           <div className="sub-panel">
-            <LiquidButton
-              size="xl"
-              className="text-white border border-white/30 rounded-full w-full"
-              onClick={() => navigate("/sublets/new")}
-            >
-              + Create a Listing
-            </LiquidButton>
-          </div>
+            <h3>Narrow it down</h3>
 
-          <div className="sub-panel">
-            <h3>Filter Sublets</h3>
-            <div className="sub-form">
-              <label htmlFor="term">Lease Term</label>
-              <select id="term" value={filterTerm} onChange={(e) => setFilterTerm(e.target.value)}>
-                <option value="all">All Short Term</option>
-                <option value="weeks">1–3 Weeks</option>
-                <option value="summer">Summer (May–Aug)</option>
-                <option value="winter">Winter (Dec–Jan)</option>
-              </select>
-
-              <label>Traits (match all selected)</label>
-              <div className="sub-checks">
-                {Object.entries(FEATURE_LABELS).map(([value, label]) => (
-                  <label key={value} className="sub-check">
-                    <input
-                      type="checkbox"
-                      checked={activeFeatures.includes(value)}
-                      onChange={() => toggleFeature(value)}
-                    />
-                    {label}
-                  </label>
-                ))}
-              </div>
-
-              <label htmlFor="price">Max Budget ($)</label>
-              <input id="price" type="number" placeholder="e.g. 1000"
-                value={maxBudget} onChange={(e) => setMaxBudget(e.target.value)} />
+            <label className="sub-filter-label">Lease term</label>
+            <div className="sub-term-opts">
+              {TERM_OPTS.map((t) => (
+                <button key={t.value}
+                  className={`sub-term-btn ${filterTerm === t.value ? "active" : ""}`}
+                  onClick={() => setFilterTerm(t.value)}>
+                  {t.label}
+                </button>
+              ))}
             </div>
+
+            <label className="sub-filter-label">What matters most</label>
+            <div className="sub-checks">
+              {Object.entries(FEATURE_LABELS).map(([value, label]) => (
+                <label key={value} className="sub-check">
+                  <input type="checkbox"
+                    checked={activeFeatures.includes(value)}
+                    onChange={() => toggleFeature(value)} />
+                  {label}
+                </label>
+              ))}
+            </div>
+
+            <label className="sub-filter-label">Max budget</label>
+            <input type="number" placeholder="e.g. 800"
+              value={maxBudget} onChange={(e) => setMaxBudget(e.target.value)}
+              className="sub-budget-input" />
           </div>
         </aside>
 
         {/* ── Feed ── */}
-        <main className="sub-feed">
-          <h2 className="sub-feed-title">Available Sublets</h2>
+        <main>
+          <div className="sub-browse-header">
+            <p className="sub-browse-eyebrow">Browse</p>
+            <h1>Every open sublet near UT</h1>
+          </div>
+
+          <p className="sub-feed-count">{filtered.length} places match</p>
+
           {loading ? (
             <p className="sub-empty">Loading listings…</p>
           ) : filtered.length === 0 ? (
-            <p className="sub-empty">No verified matches found matching these parameters.</p>
+            <p className="sub-empty">No verified matches found.</p>
           ) : (
             filtered.map((item) => (
-              <div
-                className="sub-card sub-card-clickable"
-                key={item.id}
+              <div className="sub-card" key={item.id}
                 onClick={() => navigate(`/sublets/${item.id}`)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter") navigate(`/sublets/${item.id}`); }}
-              >
+                role="button" tabIndex={0}
+                onKeyDown={(e) => { if (e.key === "Enter") navigate(`/sublets/${item.id}`); }}>
                 <img className="sub-card-img" src={listingImage(item)} alt={item.title} loading="lazy"
                   onError={(e) => { e.currentTarget.src = listingImageFallback(item); }} />
                 <div className="sub-card-main">
-                  <h3>{item.title}</h3>
-                  <p className="sub-meta"><CalendarIcon width={14} height={14} /> {item.dates}</p>
-                  <p className="sub-meta"><TagIcon width={14} height={14} /> {TERM_LABELS[item.term] ?? item.term}</p>
+                  <div className="sub-card-title-row">
+                    <h3>{item.title}</h3>
+                    <div className="sub-card-price-inline">
+                      <span className="sub-price-big">${item.price}</span>{" "}
+                      <span className="sub-priceunit-sm">{item.priceUnit}</span>
+                    </div>
+                  </div>
+                  <p className="sub-meta">{item.location} · {item.dates}</p>
                   {item.features?.length > 0 && (
                     <div className="sub-tags">
                       {item.features.map((f) => (
@@ -123,10 +132,6 @@ export default function Sublets() {
                   )}
                   <p className="sub-desc">{item.desc}</p>
                   <p className="sub-postedby">Posted by {item.postedBy}</p>
-                </div>
-                <div className="sub-card-price">
-                  <span className="sub-price">${item.price}</span>
-                  <span className="sub-priceunit">{item.priceUnit}</span>
                 </div>
               </div>
             ))
