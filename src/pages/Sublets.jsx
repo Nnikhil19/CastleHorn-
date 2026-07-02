@@ -54,7 +54,10 @@ export default function Sublets() {
           <span className="sub-brand-icon">C</span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
-        <Link to="/" className="sub-back">← Back home</Link>
+        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+          <Link to="/map" className="sub-back">🗺 Map view</Link>
+          <Link to="/" className="sub-back">← Back home</Link>
+        </div>
       </nav>
 
       <div className="sub-layout">

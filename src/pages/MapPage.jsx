@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getListings, TERM_LABELS } from "../lib/listings";
+import { getListings, TERM_LABELS, listingImage, listingImageFallback } from "../lib/listings";
 import "./MapPage.css";
 
 export default function MapPage() {
@@ -50,11 +50,10 @@ export default function MapPage() {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === "Enter" && setSelected(item)}
               >
-                {item.image && (
-                  <div className="map-card-img">
-                    <img src={item.image} alt={item.title} />
-                  </div>
-                )}
+                <div className="map-card-img">
+                  <img src={listingImage(item)} alt={item.title}
+                    onError={(e) => { e.currentTarget.src = listingImageFallback(item); }} />
+                </div>
                 <div className="map-card-info">
                   <h3>{item.title}</h3>
                   <p className="map-card-address">📍 {item.address}</p>
