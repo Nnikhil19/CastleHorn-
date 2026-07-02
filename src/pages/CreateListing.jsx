@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { addListing, FEATURE_LABELS } from "../lib/listings";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import "./Sublets.css";
 
 const formatDate = (iso) => {
@@ -15,7 +14,9 @@ const formatDate = (iso) => {
 export default function CreateListing() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    title: "", startDate: "", endDate: "", term: "weeks", price: "", unit: "per stay", desc: "", name: "",
+    title: "", startDate: "", endDate: "", term: "weeks",
+    price: "", unit: "per stay", desc: "", name: "",
+    location: "", phone: "", contact: "",
   });
   const [features, setFeatures] = useState([]);
   const [error, setError] = useState("");
@@ -29,7 +30,7 @@ export default function CreateListing() {
     e.preventDefault();
     const price = parseInt(form.price, 10);
     if (!form.title || !form.startDate || !form.endDate || !form.desc || !form.name || isNaN(price)) {
-      setError("Please fill in all fields with a valid price.");
+      setError("Please fill in all required fields with a valid price.");
       return;
     }
     if (form.endDate < form.startDate) {
@@ -42,6 +43,7 @@ export default function CreateListing() {
     try {
       await addListing({
         title: form.title,
+        location: form.location || "Austin, TX",
         dates: `${formatDate(form.startDate)} – ${formatDate(form.endDate)}`,
         term: form.term,
         features,
@@ -49,6 +51,8 @@ export default function CreateListing() {
         priceUnit: form.unit,
         desc: form.desc,
         postedBy: form.name,
+        posterEmail: form.contact || "",
+        phone: form.phone || "",
       });
       navigate("/sublets");
     } catch (err) {
@@ -61,7 +65,10 @@ export default function CreateListing() {
   return (
     <div className="sub-page">
       <nav className="sub-nav">
-        <Link to="/" className="sub-brand">Castle<span>Horn</span></Link>
+        <Link to="/" className="sub-brand">
+          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-text">Castle<span>Horn</span></span>
+        </Link>
         <Link to="/sublets" className="sub-back">← Back to listings</Link>
       </nav>
 
@@ -71,11 +78,15 @@ export default function CreateListing() {
           <p className="cl-sub">Post your sublet for fellow Longhorns to find.</p>
 
           <form onSubmit={handleSubmit} className="sub-form">
-            <label htmlFor="new-title">Place Name</label>
+            <label htmlFor="new-title">Place Name *</label>
             <input id="new-title" type="text" required placeholder="e.g. Apartment Room"
               value={form.title} onChange={(e) => setField("title", e.target.value)} />
 
-            <label>Dates Available</label>
+            <label htmlFor="new-location">Neighborhood / Area</label>
+            <input id="new-location" type="text" placeholder="e.g. West Campus, Austin"
+              value={form.location} onChange={(e) => setField("location", e.target.value)} />
+
+            <label>Dates Available *</label>
             <div className="cl-date-row">
               <div>
                 <label htmlFor="new-start-date" className="cl-date-sublabel">Start</label>
@@ -111,7 +122,7 @@ export default function CreateListing() {
               ))}
             </div>
 
-            <label htmlFor="new-price">Price ($)</label>
+            <label htmlFor="new-price">Price ($) *</label>
             <input id="new-price" type="number" required placeholder="e.g. 650"
               value={form.price} onChange={(e) => setField("price", e.target.value)} />
 
@@ -121,24 +132,27 @@ export default function CreateListing() {
               <option value="per month">per month</option>
             </select>
 
-            <label htmlFor="new-desc">Description</label>
+            <label htmlFor="new-desc">Description *</label>
             <textarea id="new-desc" rows={4} required placeholder="Short details…"
               value={form.desc} onChange={(e) => setField("desc", e.target.value)} />
 
-            <label htmlFor="new-name">Your Name</label>
+            <label htmlFor="new-name">Your Name *</label>
             <input id="new-name" type="text" required placeholder="e.g. Sarah M."
               value={form.name} onChange={(e) => setField("name", e.target.value)} />
 
+            <label htmlFor="new-contact">Contact Email (UT email gets a Verified badge)</label>
+            <input id="new-contact" type="email" placeholder="you@utexas.edu"
+              value={form.contact} onChange={(e) => setField("contact", e.target.value)} />
+
+            <label htmlFor="new-phone">Phone Number</label>
+            <input id="new-phone" type="tel" placeholder="(512) 555-0100"
+              value={form.phone} onChange={(e) => setField("phone", e.target.value)} />
+
             {error && <p className="cl-error">{error}</p>}
 
-            <LiquidButton
-              type="submit"
-              size="xl"
-              disabled={submitting}
-              className="text-white border border-white/30 rounded-full w-full mt-1"
-            >
+            <button type="submit" className="sub-btn" disabled={submitting}>
               {submitting ? "Posting…" : "Post Listing"}
-            </LiquidButton>
+            </button>
           </form>
         </div>
       </div>

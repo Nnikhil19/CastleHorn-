@@ -57,6 +57,7 @@ const SEED_LISTINGS = [
     id: "seed-1",
     title: "Apartment Room",
     location: "West Campus, Austin",
+    address: "2200 Rio Grande St, Austin, TX 78705",
     dates: "Dec 15, 2026 – Jan 08, 2027",
     term: "weeks",
     features: ["cleanliness", "communication"],
@@ -65,11 +66,15 @@ const SEED_LISTINGS = [
     priceUnit: "per stay",
     desc: "One bedroom and private bathroom available while I am away for winter break. Looking for a clean, quiet, and considerate roommate.",
     postedBy: "Sarah M.",
+    posterEmail: "sarah.m@utexas.edu",
+    phone: "(512) 555-0191",
+    underReview: false,
   },
   {
     id: "seed-2",
     title: "High-Rise Room",
     location: "Rio Grande, Austin",
+    address: "100 W 24th St, Austin, TX 78712",
     dates: "Jun 01, 2026 – Aug 12, 2026",
     term: "summer",
     features: ["cheap", "communication"],
@@ -78,11 +83,15 @@ const SEED_LISTINGS = [
     priceUnit: "per month",
     desc: "One bedroom available for the summer. Perfect balance of affordability and quality. The other roommates are UT students.",
     postedBy: "Alex R.",
+    posterEmail: "alex.r@my.utexas.edu",
+    phone: "(512) 555-0234",
+    underReview: false,
   },
   {
     id: "seed-3",
     title: "Condo Room",
     location: "North Campus, Austin",
+    address: "3001 Speedway, Austin, TX 78705",
     dates: "May 25, 2026 – Jul 31, 2026",
     term: "summer",
     features: ["cleanliness", "maintenance"],
@@ -91,11 +100,15 @@ const SEED_LISTINGS = [
     priceUnit: "per month",
     desc: "Large private bedroom available for the summer. Well built unit with few maintenance problems. Located right next to the UT bus stop.",
     postedBy: "Jordan K.",
+    posterEmail: "jordan.k@utexas.edu",
+    phone: "(512) 555-0378",
+    underReview: false,
   },
   {
     id: "seed-4",
     title: "Co-op Shared Space",
     location: "Hyde Park, Austin",
+    address: "4000 Avenue B, Austin, TX 78751",
     dates: "Jan 10, 2026 – May 15, 2026",
     term: "winter",
     features: ["communication", "security"],
@@ -104,6 +117,9 @@ const SEED_LISTINGS = [
     priceUnit: "per month",
     desc: "Great community environment. Focus on strong communication, respect for boundaries, and mutual trust.",
     postedBy: "Taylor P.",
+    posterEmail: "taylor.p@utexas.edu",
+    phone: "(512) 555-0412",
+    underReview: false,
   },
 ];
 
@@ -128,5 +144,23 @@ export async function getListingById(id) {
 
 // Persist a new listing to Firestore so every user sees it.
 export async function addListing(listing) {
-  await addDoc(listingsCol, { ...listing, createdAt: serverTimestamp() });
+  await addDoc(listingsCol, { ...listing, underReview: true, createdAt: serverTimestamp() });
+}
+
+// localStorage-backed peer reviews (keyed by listing id).
+const reviewKey = (id) => `ch_reviews_${id}`;
+
+export function getReviews(listingId) {
+  try {
+    return JSON.parse(localStorage.getItem(reviewKey(listingId)) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function addReview(listingId, { reviewer, text }) {
+  const existing = getReviews(listingId);
+  const updated = [{ reviewer, text, ts: Date.now() }, ...existing];
+  localStorage.setItem(reviewKey(listingId), JSON.stringify(updated));
+  return updated;
 }

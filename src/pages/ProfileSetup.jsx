@@ -100,7 +100,7 @@ export default function ProfileSetup() {
     const next = {
       fullName: fullName.length >= 2,
       username: /^[a-zA-Z0-9_]{3,20}$/.test(username),
-      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
+      email: /^[^\s@]+@(utexas\.edu|my\.utexas\.edu)$/.test(email),
       password: password.length >= 6,
       confirmPassword: password === confirmPassword,
     };
@@ -180,7 +180,7 @@ export default function ProfileSetup() {
                 value={data.email || ""} onChange={(e) => update("email", e.target.value)}
                 className={errors.email === false ? "error" : ""}
               />
-              {errors.email === false && <p className="ps-error visible">Please enter a valid email address.</p>}
+              {errors.email === false && <p className="ps-error visible">Please use your @utexas.edu or @my.utexas.edu email.</p>}
 
               <label htmlFor="password">Password</label>
               <input

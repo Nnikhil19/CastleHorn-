@@ -3,6 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { getListings, listingImage, listingImageFallback, TERM_LABELS, FEATURE_LABELS } from "../lib/listings";
 import "./Sublets.css";
 
+const isUTVerified = (item) =>
+  item.posterEmail?.endsWith("@utexas.edu") || item.posterEmail?.endsWith("@my.utexas.edu");
+
 const TERM_OPTS = [
   { value: "all",    label: "All short-term" },
   { value: "weeks",  label: "1–3 Weeks" },
@@ -123,6 +126,16 @@ export default function Sublets() {
                     </div>
                   </div>
                   <p className="sub-meta">{item.location} · {item.dates}</p>
+                  {(isUTVerified(item) || item.underReview) && (
+                    <div className="listing-badges">
+                      {isUTVerified(item) && (
+                        <span className="listing-badge badge-verified">UT Verified</span>
+                      )}
+                      {item.underReview && (
+                        <span className="listing-badge badge-review">Under Review</span>
+                      )}
+                    </div>
+                  )}
                   {item.features?.length > 0 && (
                     <div className="sub-tags">
                       {item.features.map((f) => (
