@@ -45,6 +45,7 @@
   transition: color 0.15s;
 }
 .sub-back:hover { color: var(--dark); }
+.sub-nav-links { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
 
 /* browse layout */
 .sub-layout {
@@ -200,6 +201,17 @@
   object-fit: cover;
   border-radius: 13px;
   background: var(--cream-warm);
+}
+.sub-card-placeholder,
+.room-card-placeholder,
+.ld-placeholder,
+.map-card-placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--cream-warm);
+  color: var(--muted);
+  font: 700 13px/1.3 var(--font-body);
+  text-align: center;
 }
 
 .sub-card-main { flex: 1; min-width: 0; padding: 4px 0; }
@@ -426,6 +438,7 @@
   letter-spacing: 0.02em;
 }
 .badge-verified { background: var(--orange); color: #FFF7EC; }
+.badge-approved { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
 .badge-review { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
 
 /* ── Contact panel (listing detail) ── */
@@ -524,6 +537,73 @@
   transition: background 0.18s;
 }
 .ld-review-submit:hover { background: var(--orange-dark); }
+.ld-title-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+.ld-title-row .ld-title { margin: 0; }
+.ld-map {
+  width: 100%;
+  min-height: 320px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--cream-warm);
+}
+.cl-success {
+  background: rgba(22, 101, 52, 0.08);
+  border: 1px solid rgba(22, 101, 52, 0.22);
+  border-radius: var(--radius-sm);
+  color: #166534;
+  font: 600 13px/1.5 var(--font-body);
+  padding: 10px 14px;
+  margin-top: 14px;
+}
+.simple-page {
+  width: min(900px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: clamp(36px, 6vw, 72px) 0 90px;
+}
+.simple-page h1 {
+  font: 800 clamp(36px, 6vw, 62px)/1 var(--font-heading);
+  letter-spacing: -1.4px;
+  margin: 12px 0 28px;
+}
+.simple-section,
+.blog-single {
+  background: var(--cream-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 18px;
+}
+.simple-section h2 {
+  font: 700 22px/1.2 var(--font-heading);
+  margin: 0 0 10px;
+}
+.simple-section p,
+.blog-single p {
+  font: 400 16px/1.7 var(--font-body);
+  color: var(--mid);
+  margin: 0 0 12px;
+}
+.review-page-form { margin-bottom: 24px; }
+.admin-listing {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+.admin-listing h3 { margin: 0 0 8px; font: 700 18px/1.2 var(--font-heading); }
+.admin-listing p { margin: 0 0 6px; color: var(--mid); }
+.admin-actions { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; justify-content: flex-end; }
+.admin-actions button {
+  border: 1px solid var(--border-mid);
+  background: var(--cream);
+  color: var(--dark);
+  border-radius: 999px;
+  padding: 9px 14px;
+  font: 700 13px/1 var(--font-body);
+  cursor: pointer;
+}
+.admin-actions button:hover { border-color: var(--orange); color: var(--orange); }
 
 @media (max-width: 860px) {
   .sub-layout { grid-template-columns: 1fr; }

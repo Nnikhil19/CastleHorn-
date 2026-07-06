@@ -6,8 +6,11 @@ import {
   signInWithPopup,
   sendEmailVerification,
   onAuthStateChanged,
+  signOut,
+  updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase";
+import { isUTEmail } from "../lib/listings";
 import "./AuthPage.css";
 
 const GoogleIcon = () => (
@@ -51,21 +54,38 @@ export default function AuthPage() {
     return map[code] ?? "Something went wrong. Please try again.";
   };
 
+  const requireUTEmail = (value) => {
+    if (!isUTEmail(value)) {
+      throw new Error("CastleHorn accounts require a @utexas.edu or @my.utexas.edu email.");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
     setLoading(true);
     try {
+      requireUTEmail(email);
       if (mode === "register") {
         const { user } = await createUserWithEmailAndPassword(auth, email, password);
-        sendEmailVerification(user).catch(() => {});
-        navigate("/profile-setup");
+        if (name.trim()) {
+          await updateProfile(user, { displayName: name.trim() });
+        }
+        await sendEmailVerification(user);
+        await signOut(auth);
+        setError("Verification link sent. Verify your UT email, then log in to finish your profile.");
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        const { user } = await signInWithEmailAndPassword(auth, email, password);
+        requireUTEmail(user.email);
+        if (!user.emailVerified) {
+          sendEmailVerification(user).catch(() => {});
+          setError("Please verify your UT email. We sent a new verification link.");
+          return;
+        }
         navigate("/");
       }
     } catch (err) {
-      setError(friendlyError(err.code));
+      setError(err.code ? friendlyError(err.code) : err.message);
     } finally {
       setLoading(false);
     }
@@ -75,8 +95,13 @@ export default function AuthPage() {
     clearError();
     setLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
-      navigate("/");
+      const { user } = await signInWithPopup(auth, googleProvider);
+      if (!isUTEmail(user.email)) {
+        await signOut(auth);
+        setError("Please use a UT Austin Google account ending in @utexas.edu or @my.utexas.edu.");
+        return;
+      }
+      navigate("/profile-setup");
     } catch (err) {
       setError(friendlyError(err.code));
     } finally {
@@ -93,7 +118,7 @@ export default function AuthPage() {
         <div className="auth-blob-c" />
       </div>
 
-      <Link to="/" className="auth-back">← Back to CastleHorn</Link>
+      <Link to="/" className="auth-back">Back to CastleHorn</Link>
 
       <div className="auth-card">
         <div className="auth-logo">Castle<span>Horn</span></div>
@@ -114,8 +139,8 @@ export default function AuthPage() {
         </h2>
         <p className="auth-sub">
           {mode === "login"
-            ? "Log in to message hosts and post your place."
-            : "It's free, and it takes about a minute."}
+            ? "Log in with your verified UT email to post or contact hosts."
+            : "Use a UT Austin email so every account can be verified."}
         </p>
 
         <button className="google-btn" onClick={handleGoogle} disabled={loading}>
@@ -145,7 +170,7 @@ export default function AuthPage() {
               Password
               {mode === "register" && <span className="hint"> (min 6 characters)</span>}
             </label>
-            <input id="auth-password" type="password" placeholder="••••••••"
+            <input id="auth-password" type="password" placeholder="Password"
               value={password} onChange={(e) => setPassword(e.target.value)}
               required minLength={6}
               autoComplete={mode === "register" ? "new-password" : "current-password"} />
@@ -154,7 +179,7 @@ export default function AuthPage() {
           {error && <p className="auth-error">{error}</p>}
 
           <button type="submit" className="auth-submit" disabled={loading}>
-            {loading ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
+            {loading ? "Please wait..." : mode === "login" ? "Log in" : "Create account"}
           </button>
         </form>
 

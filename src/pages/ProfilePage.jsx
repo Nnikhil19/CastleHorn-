@@ -8,7 +8,6 @@ const ALL_PROFILES_KEY = "ch_all_profiles";
 const SURVEY_LABELS = {
   cleanliness: {
     label: "Cleanliness",
-    icon: "🧹",
     values: {
       "very-clean": "Very clean",
       tidy: "Generally tidy",
@@ -18,17 +17,15 @@ const SURVEY_LABELS = {
   },
   sleep: {
     label: "Sleep Schedule",
-    icon: "🌙",
     values: {
       "early-bird": "Early bird",
-      average: "Average (10pm–midnight)",
+      average: "Average",
       "night-owl": "Night owl",
       irregular: "Irregular",
     },
   },
   guests: {
     label: "Guests",
-    icon: "🎉",
     values: {
       never: "Rarely / never",
       sometimes: "A few times a month",
@@ -38,7 +35,6 @@ const SURVEY_LABELS = {
   },
   noise: {
     label: "Noise Level",
-    icon: "🔊",
     values: {
       silent: "Needs quiet",
       low: "Low background OK",
@@ -48,7 +44,6 @@ const SURVEY_LABELS = {
   },
   dealbreaker: {
     label: "Dealbreakers",
-    icon: "🚫",
     values: {
       "no-pets": "No pets",
       "no-smoking": "No smoking indoors",
@@ -89,7 +84,7 @@ export default function ProfilePage() {
             <span className="sub-brand-icon">C</span>
             <span className="sub-brand-text">Castle<span>Horn</span></span>
           </Link>
-          <Link to="/sublets" className="sub-back">← Listings</Link>
+          <Link to="/sublets" className="sub-back">Listings</Link>
         </nav>
         <div className="pp-not-found">
           <p>Profile not found for @{username}</p>
@@ -118,11 +113,10 @@ export default function ProfilePage() {
           <span className="sub-brand-icon">C</span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
-        <Link to="/sublets" className="sub-back">← Listings</Link>
+        <Link to="/sublets" className="sub-back">Listings</Link>
       </nav>
 
       <div className="pp-wrap">
-
         <div className="pp-card">
           <div className="pp-avatar">{initials}</div>
           <div className="pp-identity">
@@ -130,7 +124,7 @@ export default function ProfilePage() {
             <p className="pp-username">@{profile.username}</p>
             {(profile.location || age || profile.gender) && (
               <p className="pp-meta">
-                {profile.location && <span>📍 {profile.location}</span>}
+                {profile.location && <span>{profile.location}</span>}
                 {profile.location && (age || profile.gender) && <span className="pp-dot">·</span>}
                 {age && <span>{age} years old</span>}
                 {age && profile.gender && <span className="pp-dot">·</span>}
@@ -152,15 +146,16 @@ export default function ProfilePage() {
 
         {Object.keys(survey).length > 0 && (
           <div className="pp-section">
-            <h2 className="pp-section-title">🏠 Renter Habits</h2>
+            <h2 className="pp-section-title">Renter Habits</h2>
             <div className="pp-habits">
               {profile.gender && (
                 <div className="pp-habit-row">
-                  <span className="pp-habit-icon">🪪</span>
                   <div className="pp-habit-info">
                     <span className="pp-habit-label">Gender</span>
                     <span className="pp-habit-value">
-                      {profile.gender === "nonbinary" ? "Non-binary" : profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}
+                      {profile.gender === "nonbinary"
+                        ? "Non-binary"
+                        : profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}
                     </span>
                   </div>
                 </div>
@@ -170,7 +165,6 @@ export default function ProfilePage() {
                 if (!val) return null;
                 return (
                   <div className="pp-habit-row" key={key}>
-                    <span className="pp-habit-icon">{meta.icon}</span>
                     <div className="pp-habit-info">
                       <span className="pp-habit-label">{meta.label}</span>
                       <span className="pp-habit-value">{meta.values[val] ?? val}</span>
@@ -184,11 +178,10 @@ export default function ProfilePage() {
 
         {profile.email && (
           <div className="pp-section">
-            <h2 className="pp-section-title">📬 Contact</h2>
+            <h2 className="pp-section-title">Contact</h2>
             <a href={`mailto:${profile.email}`} className="pp-email">{profile.email}</a>
           </div>
         )}
-
       </div>
     </div>
   );
