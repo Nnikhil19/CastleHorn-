@@ -17,6 +17,5 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ hd: "utexas.edu" });
 export const db = getFirestore(app);
 export const storage = getStorage(app);

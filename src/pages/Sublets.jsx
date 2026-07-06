@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { getListings, listingImage, TERM_LABELS, FEATURE_LABELS, isUTEmail } from "../lib/listings";
+import { getListings, listingImage, TERM_LABELS, FEATURE_LABELS, isVerifiedEmail } from "../lib/listings";
 import "./Sublets.css";
 
 const TERM_OPTS = [
@@ -162,7 +162,7 @@ export default function Sublets() {
                     </div>
                     <p className="sub-meta">{item.location} - {item.dates}</p>
                     <div className="listing-badges">
-                      {isUTEmail(item.posterEmail) && <span className="listing-badge badge-verified">UT Verified</span>}
+                      {isVerifiedEmail(item.posterEmail) && <span className="listing-badge badge-verified">Email Verified</span>}
                       {item.status === "approved" && <span className="listing-badge badge-approved">Approved</span>}
                     </div>
                     {item.features?.length > 0 && (

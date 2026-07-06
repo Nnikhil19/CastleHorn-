@@ -126,7 +126,7 @@ export default function ProfileSetup() {
     const next = {
       fullName: fullName.length >= 2,
       username: /^[a-zA-Z0-9_]{3,20}$/.test(username),
-      email: /^[^\s@]+@(utexas\.edu|my\.utexas\.edu)$/.test(email),
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
     };
     setErrors(next);
     if (Object.values(next).every(Boolean)) {
@@ -183,10 +183,10 @@ export default function ProfileSetup() {
                 <p className="ps-error visible">Username must be 3-20 characters, letters/numbers/underscores only.</p>
               )}
 
-              <label htmlFor="email">Verified UT Email</label>
-              <input id="email" type="email" readOnly placeholder="you@utexas.edu" autoComplete="email"
+              <label htmlFor="email">Verified Email</label>
+              <input id="email" type="email" readOnly placeholder="you@example.com" autoComplete="email"
                 value={data.email || ""} className={errors.email === false ? "error" : ""} />
-              {errors.email === false && <p className="ps-error visible">Please use your @utexas.edu or @my.utexas.edu email.</p>}
+              {errors.email === false && <p className="ps-error visible">Please use a valid email address.</p>}
 
               <button type="submit" className="ps-btn">Continue</button>
             </form>

@@ -10,7 +10,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase";
-import { isUTEmail } from "../lib/listings";
+import { isVerifiedEmail } from "../lib/listings";
 import "./AuthPage.css";
 
 const GoogleIcon = () => (
@@ -54,9 +54,9 @@ export default function AuthPage() {
     return map[code] ?? "Something went wrong. Please try again.";
   };
 
-  const requireUTEmail = (value) => {
-    if (!isUTEmail(value)) {
-      throw new Error("CastleHorn accounts require a @utexas.edu or @my.utexas.edu email.");
+  const requireValidEmail = (value) => {
+    if (!isVerifiedEmail(value)) {
+      throw new Error("Please use a valid email address.");
     }
   };
 
@@ -65,7 +65,7 @@ export default function AuthPage() {
     clearError();
     setLoading(true);
     try {
-      requireUTEmail(email);
+      requireValidEmail(email);
       if (mode === "register") {
         const { user } = await createUserWithEmailAndPassword(auth, email, password);
         if (name.trim()) {
@@ -73,13 +73,13 @@ export default function AuthPage() {
         }
         await sendEmailVerification(user);
         await signOut(auth);
-        setError("Verification link sent. Verify your UT email, then log in to finish your profile.");
+        setError("Verification link sent. Verify your email, then log in to finish your profile.");
       } else {
         const { user } = await signInWithEmailAndPassword(auth, email, password);
-        requireUTEmail(user.email);
+        requireValidEmail(user.email);
         if (!user.emailVerified) {
           sendEmailVerification(user).catch(() => {});
-          setError("Please verify your UT email. We sent a new verification link.");
+          setError("Please verify your email. We sent a new verification link.");
           return;
         }
         navigate("/");
@@ -96,9 +96,9 @@ export default function AuthPage() {
     setLoading(true);
     try {
       const { user } = await signInWithPopup(auth, googleProvider);
-      if (!isUTEmail(user.email)) {
+      if (!isVerifiedEmail(user.email)) {
         await signOut(auth);
-        setError("Please use a UT Austin Google account ending in @utexas.edu or @my.utexas.edu.");
+        setError("Please use a valid Google account email.");
         return;
       }
       navigate("/profile-setup");
@@ -139,8 +139,8 @@ export default function AuthPage() {
         </h2>
         <p className="auth-sub">
           {mode === "login"
-            ? "Log in with your verified UT email to post or contact hosts."
-            : "Use a UT Austin email so every account can be verified."}
+            ? "Log in with your verified email to post or contact hosts."
+            : "Use any email address for testing. Verification still helps protect accounts."}
         </p>
 
         <button className="google-btn" onClick={handleGoogle} disabled={loading}>
@@ -148,7 +148,7 @@ export default function AuthPage() {
           Continue with Google
         </button>
 
-        <div className="divider"><span>or use your UT email</span></div>
+        <div className="divider"><span>or use your email</span></div>
 
         <form onSubmit={handleSubmit} noValidate>
           {mode === "register" && (
@@ -161,7 +161,7 @@ export default function AuthPage() {
           )}
           <div className="field">
             <label htmlFor="auth-email">Email</label>
-            <input id="auth-email" type="email" placeholder="you@utexas.edu"
+            <input id="auth-email" type="email" placeholder="you@example.com"
               value={email} onChange={(e) => setEmail(e.target.value)}
               required autoComplete="email" />
           </div>

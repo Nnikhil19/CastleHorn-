@@ -50,7 +50,7 @@ export const Auth = () => {
       <form onSubmit={handleEmailAuth} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <input
           type="email"
-          placeholder="you@utexas.edu"
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required

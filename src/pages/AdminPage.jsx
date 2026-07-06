@@ -66,7 +66,7 @@ export default function AdminPage() {
         <p className="sub-browse-eyebrow">Admin</p>
         <h1>Listing controls</h1>
         {!user ? (
-          <p className="sub-empty">Log in with an admin UT account to review listings.</p>
+          <p className="sub-empty">Log in with an admin account to review listings.</p>
         ) : !allowed ? (
           <p className="sub-empty">This account is not allowed to use admin controls. Add approved admin emails to VITE_ADMIN_EMAILS.</p>
         ) : loading ? (

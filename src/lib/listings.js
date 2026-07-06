@@ -28,8 +28,8 @@ export const FEATURE_LABELS = {
   security: "Security / Trust",
 };
 
-export const isUTEmail = (email = "") =>
-  /@(utexas\.edu|my\.utexas\.edu)$/i.test(String(email).trim());
+export const isVerifiedEmail = (email = "") =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
 
 export function listingImage(listing) {
   return listing?.photos?.[0] || listing?.image || "";

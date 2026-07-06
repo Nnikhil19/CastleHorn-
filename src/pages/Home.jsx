@@ -15,11 +15,11 @@ const CATEGORIES = [
 
 const MARQUEE_ITEMS = [
   "No broker fees",
-  "UT email verified",
+  "Email verified",
   "Manual review",
   "Direct renter contact",
   "No broker fees",
-  "UT email verified",
+  "Email verified",
   "Manual review",
   "Direct renter contact",
 ];
@@ -27,7 +27,7 @@ const MARQUEE_ITEMS = [
 const HOW_STEPS = [
   { n: "1", t: "Search approved listings", d: "Filter by date, area, lease term, and rent until you find a place that fits." },
   { n: "2", t: "Check the details", d: "Review real photos, the address, rent, profile info, and the public review section." },
-  { n: "3", t: "Contact directly", d: "Use the host's UT email or phone number to ask questions and arrange the handoff." },
+  { n: "3", t: "Contact directly", d: "Use the host's email or phone number to ask questions and arrange the handoff." },
 ];
 
 function RoomCard({ item, onClick }) {
@@ -123,7 +123,7 @@ export default function Home() {
       <section className="hero">
         <div className="hero-badge">
           <span className="hero-badge-dot" />
-          <span>UT-only sublets with manual review</span>
+          <span>Testing mode: all email domains allowed</span>
         </div>
         <h1>Sublets near campus, <span className="hero-italic">minus the stress.</span></h1>
         <p className="hero-sub">
@@ -208,7 +208,7 @@ export default function Home() {
           <div className="host-cta-content">
             <span className="host-cta-badge">Got a place sitting empty?</span>
             <h2>Submit it for review.</h2>
-            <p>Listings require a UT account, full address, monthly rent, real photos, and proof of occupancy before they go public.</p>
+            <p>Listings require an account, full address, monthly rent, real photos, and proof of occupancy before they go public.</p>
             <button className="host-cta-btn" onClick={goToPost}>Post a listing</button>
           </div>
         </div>
@@ -217,8 +217,8 @@ export default function Home() {
       <section className="blogs">
         <h2 className="blogs-title">How CastleHorn works</h2>
         <div className="blog-single">
-          <p>CastleHorn is a UT-only sublet board. Create an account with a UT email, complete a profile, and browse approved listings by area, dates, rent, and roommate traits.</p>
-          <p>Subletters upload real photos, a full property address, monthly rent, and proof of occupancy. Admins review listings before they become public. Renters contact hosts directly by UT email or phone.</p>
+          <p>CastleHorn is in testing mode, so any valid email can create an account. Complete a profile, then browse approved listings by area, dates, rent, and roommate traits.</p>
+          <p>Subletters upload real photos, a full property address, monthly rent, and proof of occupancy. Admins review listings before they become public. Renters contact hosts directly by email or phone.</p>
           <button className="rooms-see-all" onClick={() => navigate("/blog")}>Read the guide</button>
         </div>
       </section>
@@ -227,13 +227,13 @@ export default function Home() {
         <div className="about-text">
           <span className="about-eyebrow">About CastleHorn</span>
           <h2>Built for Longhorn sublets.</h2>
-          <p>CastleHorn keeps the workflow focused: verified UT accounts, real listing evidence, public reviews, map search, profile pages, and direct contact instead of in-app DMs.</p>
+          <p>CastleHorn keeps the workflow focused: verified accounts, real listing evidence, public reviews, map search, profile pages, and direct contact instead of in-app DMs.</p>
           <button className="btn btn-dark" style={{ marginTop: 12 }} onClick={() => navigate("/auth?mode=register")}>
             Join the community
           </button>
         </div>
         <div className="about-photos about-photos-text">
-          <div className="about-photo-copy p1">UT-only accounts</div>
+          <div className="about-photo-copy p1">Email-verified accounts</div>
           <div className="about-photo-copy p2">Manual listing review</div>
           <div className="about-photo-copy p3">Direct renter contact</div>
         </div>
@@ -267,7 +267,7 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <span>© 2026 CastleHorn</span>
-          <span>Made for UT Austin students</span>
+          <span>Testing mode: all email domains allowed</span>
         </div>
       </footer>
     </div>

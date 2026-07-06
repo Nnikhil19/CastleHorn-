@@ -48,7 +48,7 @@ const PAGES = {
       },
       {
         heading: "Use UT identity signals",
-        body: "Prefer UT email communication, compare profile information, and keep important agreements in writing. If anything feels rushed or inconsistent, slow down.",
+        body: "Prefer verified email communication, compare profile information, and keep important agreements in writing. If anything feels rushed or inconsistent, slow down.",
       },
       {
         heading: "Report suspicious listings",

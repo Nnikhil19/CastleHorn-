@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { addListing, FEATURE_LABELS, isUTEmail } from "../lib/listings";
+import { addListing, FEATURE_LABELS, isVerifiedEmail } from "../lib/listings";
 import { auth, storage } from "../config/firebase";
 import "./Sublets.css";
 
@@ -83,19 +83,19 @@ export default function CreateListing() {
     const price = parseInt(form.monthlyRent, 10);
 
     if (!user) {
-      setError("Please create or log into a UT-verified account before posting.");
+      setError("Please create or log into a verified account before posting.");
       return;
     }
     if (!user.emailVerified) {
-      setError("Please verify your UT email before posting a listing.");
+      setError("Please verify your email before posting a listing.");
       return;
     }
     if (!profile.username) {
       setError("Please complete your CastleHorn profile before posting a listing.");
       return;
     }
-    if (!isUTEmail(user.email) || !isUTEmail(form.contact)) {
-      setError("Listings must use a @utexas.edu or @my.utexas.edu contact email.");
+    if (!isVerifiedEmail(user.email) || !isVerifiedEmail(form.contact)) {
+      setError("Listings must use a valid contact email.");
       return;
     }
     if (!form.title || !form.startDate || !form.endDate || !form.desc || !form.name || !form.address || isNaN(price)) {
@@ -123,7 +123,7 @@ export default function CreateListing() {
       return;
     }
     if (!form.phone && !form.contact) {
-      setError("Please include either a phone number or UT email for direct contact.");
+      setError("Please include either a phone number or email for direct contact.");
       return;
     }
 
@@ -182,7 +182,7 @@ export default function CreateListing() {
           <p className="cl-sub">Every listing needs real photos, a full property address, proof of occupancy, and admin review.</p>
 
           {!user && (
-            <p className="cl-error">You need to log in with a UT email before posting.</p>
+            <p className="cl-error">You need to log in with a verified email before posting.</p>
           )}
 
           <form onSubmit={handleSubmit} className="sub-form">
@@ -249,8 +249,8 @@ export default function CreateListing() {
             <input id="new-name" type="text" required placeholder="Jane Longhorn"
               value={form.name} onChange={(e) => setField("name", e.target.value)} />
 
-            <label htmlFor="new-contact">UT Contact Email *</label>
-            <input id="new-contact" type="email" required placeholder="you@utexas.edu"
+            <label htmlFor="new-contact">Contact Email *</label>
+            <input id="new-contact" type="email" required placeholder="you@example.com"
               value={form.contact} onChange={(e) => setField("contact", e.target.value)} />
 
             <label htmlFor="new-phone">Phone Number</label>

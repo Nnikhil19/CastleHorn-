@@ -7,7 +7,7 @@ import {
   FEATURE_LABELS,
   getReviews,
   addReview,
-  isUTEmail,
+  isVerifiedEmail,
 } from "../lib/listings";
 import "./Sublets.css";
 
@@ -79,7 +79,7 @@ export default function ListingDetail() {
           <div className="ld-body">
             <div className="ld-title-row">
               <h1 className="ld-title">{listing.title}</h1>
-              {isUTEmail(listing.posterEmail) && <span className="listing-badge badge-verified">UT Verified</span>}
+              {isVerifiedEmail(listing.posterEmail) && <span className="listing-badge badge-verified">Email Verified</span>}
               {listing.status === "approved" && <span className="listing-badge badge-approved">Approved</span>}
               {listing.underReview && <span className="listing-badge badge-review">Under Review</span>}
             </div>
