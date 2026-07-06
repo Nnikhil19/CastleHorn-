@@ -181,6 +181,14 @@
 .profile-tile-name { font: 800 18px/1.15 var(--font-heading); }
 .profile-tile-user { font: 700 13px/1 var(--font-body); color: var(--orange); }
 .profile-tile-meta { font: 500 13px/1.4 var(--font-body); color: var(--muted); }
+.profile-tile-demo {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--cream-warm);
+  border: 1px solid var(--border);
+  color: var(--mid);
+  font: 700 11px/1 var(--font-body);
+}
 
 @media (max-width: 480px) {
   .pp-card { flex-direction: column; text-align: center; }

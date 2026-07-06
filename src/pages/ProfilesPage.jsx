@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { mergeDemoProfiles } from "../lib/demoProfiles";
 import "./ProfilePage.css";
 import "./Sublets.css";
 
@@ -9,7 +10,7 @@ function loadProfiles() {
   const own = JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}");
   const all = JSON.parse(localStorage.getItem(ALL_PROFILES_KEY) || "[]");
   const merged = own.username ? [own, ...all.filter((p) => p.username !== own.username)] : all;
-  return merged.filter((p) => p.username);
+  return mergeDemoProfiles(merged.filter((p) => p.username));
 }
 
 export default function ProfilesPage() {
@@ -46,6 +47,7 @@ export default function ProfilesPage() {
                   <span className="pp-avatar">{initials}</span>
                   <span className="profile-tile-name">{profile.fullName || profile.username}</span>
                   <span className="profile-tile-user">@{profile.username}</span>
+                  {profile.demo && <span className="profile-tile-demo">Demo profile</span>}
                   {profile.location && <span className="profile-tile-meta">{profile.location}</span>}
                 </button>
               );

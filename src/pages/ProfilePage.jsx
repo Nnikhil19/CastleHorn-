@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { findDemoProfile } from "../lib/demoProfiles";
 import "./ProfilePage.css";
 
 const PROFILE_KEY = "ch_profileData";
@@ -73,6 +74,7 @@ export default function ProfilePage() {
     const all = JSON.parse(localStorage.getItem(ALL_PROFILES_KEY) || "[]");
     const found = all.find((p) => p.username === username);
     if (found) setProfile(found);
+    else if (findDemoProfile(username)) setProfile(findDemoProfile(username));
     else setNotFound(true);
   }, [username]);
 
