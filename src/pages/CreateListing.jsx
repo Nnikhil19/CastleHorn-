@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { addListing, FEATURE_LABELS, isVerifiedEmail, isAustinAddress } from "../lib/listings";
-import { auth, storage } from "../config/firebase";
+import { auth } from "../config/firebase";
 import { Logo } from "../components/icons";
 import "./Sublets.css";
 
 const MAX_PHOTO_MB = 8;
 const MAX_PROOF_MB = 12;
+const MAX_STORED_PHOTOS = 3;
 
 const formatDate = (iso) => {
   if (!iso) return "";
@@ -20,14 +20,51 @@ const formatDate = (iso) => {
   });
 };
 
-async function uploadFiles(files, folder) {
-  const uploads = Array.from(files).map(async (file) => {
-    const safeName = file.name.replace(/[^a-z0-9._-]/gi, "_");
-    const fileRef = ref(storage, `${folder}/${Date.now()}-${crypto.randomUUID()}-${safeName}`);
-    await uploadBytes(fileRef, file);
-    return getDownloadURL(fileRef);
+// Downscale + JPEG-compress an image file to a data URL so it can live directly
+// in the Firestore document — no Firebase Storage (and no Blaze plan) required.
+function compressImage(file, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read image."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Could not load image."));
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   });
-  return Promise.all(uploads);
+}
+
+// Compress until the encoded string fits a byte budget (Firestore docs cap at
+// ~1MB total, so each embedded image must stay small).
+async function compressToBudget(file, maxBytes) {
+  let quality = 0.72;
+  let maxDim = 1100;
+  let out = await compressImage(file, maxDim, quality);
+  while (out.length > maxBytes && quality > 0.4) {
+    quality -= 0.12;
+    out = await compressImage(file, maxDim, quality);
+  }
+  while (out.length > maxBytes && maxDim > 640) {
+    maxDim -= 200;
+    out = await compressImage(file, maxDim, quality);
+  }
+  return out;
 }
 
 const fileSizeMb = (file) => file.size / (1024 * 1024);
@@ -131,11 +168,19 @@ export default function CreateListing() {
     setError("");
     setSubmitting(true);
     try {
-      const listingId = crypto.randomUUID();
-      const [photoUrls, proofUrls] = await Promise.all([
-        uploadFiles(photos, `listing-photos/${listingId}`),
-        uploadFiles([proof], `occupancy-proof/${listingId}`),
-      ]);
+      // Embed photos directly in the listing document as compressed data URLs.
+      const photoFiles = Array.from(photos).slice(0, MAX_STORED_PHOTOS);
+      const photoUrls = [];
+      for (const file of photoFiles) {
+        photoUrls.push(await compressToBudget(file, 220000));
+      }
+
+      // Proof of occupancy: embed if it's an image; for PDFs just keep the
+      // filename so admins know one was provided (avoids the 1MB doc limit).
+      let proofOfOccupancy = null;
+      if (proof.type.startsWith("image/")) {
+        proofOfOccupancy = await compressToBudget(proof, 180000);
+      }
 
       await addListing({
         title: form.title.trim(),
@@ -154,7 +199,8 @@ export default function CreateListing() {
         posterEmail: form.contact.trim(),
         phone: form.phone.trim(),
         photos: photoUrls,
-        proofOfOccupancy: proofUrls[0],
+        proofOfOccupancy,
+        proofName: proof.name || "",
         ownerUid: user.uid,
         posterUsername: profile.username || "",
       });
@@ -162,7 +208,7 @@ export default function CreateListing() {
       setTimeout(() => navigate("/sublets"), 1200);
     } catch (err) {
       console.error(err);
-      setError("Could not save your listing. Check Firebase Storage permissions and try again.");
+      setError("Could not save your listing. Please try again, or use smaller photos.");
       setSubmitting(false);
     }
   };

@@ -1,4 +1,12 @@
 .ps-page {
+  /* Dark-theme tokens for the setup flow. These were referenced throughout
+     this file but never defined, which made labels render dark-on-dark. */
+  --dark2: #2c2418;
+  --dark3: #39301f;
+  --gray: #b4a892;
+  --gray-light: #e8dfcd;
+  --orange-light: #e8894a;
+
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -6,6 +14,7 @@
   justify-content: center;
   padding: 40px 16px;
   background: var(--dark);
+  color: var(--gray-light);
   position: relative;
 }
 
@@ -70,7 +79,7 @@ input, select, textarea {
   transition: border-color 0.15s;
   margin-bottom: 18px;
 }
-input::placeholder, textarea::placeholder { color: #555; }
+input::placeholder, textarea::placeholder { color: #8a7e6b; }
 input:focus, select:focus, textarea:focus { border-color: var(--orange); }
 input.error { border-color: #dc2626; }
 
