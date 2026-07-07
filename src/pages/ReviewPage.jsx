@@ -1,33 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getPlatformReviews, addPlatformReview } from "../lib/listings";
+import { Logo } from "../components/icons";
 import "./Sublets.css";
 
-const REVIEWS_KEY = "ch_platform_reviews";
-
-function loadReviews() {
-  return JSON.parse(localStorage.getItem(REVIEWS_KEY) || "[]");
-}
-
 export default function ReviewPage() {
-  const [reviews, setReviews] = useState(loadReviews);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = (e) => {
+  useEffect(() => {
+    let active = true;
+    getPlatformReviews()
+      .then((data) => active && setReviews(data))
+      .finally(() => active && setLoading(false));
+    return () => { active = false; };
+  }, []);
+
+  const submit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !text.trim()) return;
-    const next = [{ name: name.trim(), text: text.trim(), ts: Date.now() }, ...reviews];
-    localStorage.setItem(REVIEWS_KEY, JSON.stringify(next));
-    setReviews(next);
-    setName("");
-    setText("");
+    if (!name.trim() || !text.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      const next = await addPlatformReview({ name: name.trim(), text: text.trim() });
+      setReviews(next);
+      setName("");
+      setText("");
+    } catch (err) {
+      console.error("Failed to submit review:", err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="sub-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <Link to="/sublets" className="sub-back">Browse listings</Link>
@@ -40,13 +52,17 @@ export default function ReviewPage() {
           <input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} required />
           <textarea rows={4} placeholder="Leave feedback about CastleHorn or your sublet experience."
             value={text} onChange={(e) => setText(e.target.value)} required />
-          <button className="ld-review-submit">Submit Review</button>
+          <button className="ld-review-submit" disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit Review"}
+          </button>
         </form>
         <div className="ld-review-list">
-          {reviews.length === 0 ? (
+          {loading ? (
+            <p className="sub-empty">Loading reviews...</p>
+          ) : reviews.length === 0 ? (
             <p className="sub-empty">No platform reviews yet.</p>
           ) : reviews.map((review) => (
-            <article className="ld-review-item" key={review.ts}>
+            <article className="ld-review-item" key={review.id}>
               <p className="ld-review-author">{review.name}</p>
               <p className="ld-review-text">{review.text}</p>
             </article>

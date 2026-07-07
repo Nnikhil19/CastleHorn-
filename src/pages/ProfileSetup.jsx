@@ -103,10 +103,6 @@ export default function ProfileSetup() {
         navigate("/auth?mode=register");
         return;
       }
-      if (!user.emailVerified) {
-        navigate("/auth?mode=login");
-        return;
-      }
       setData((d) => ({
         ...d,
         fullName: d.fullName || user.displayName || "",

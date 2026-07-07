@@ -374,6 +374,7 @@
 .sub-form input,
 .sub-form select,
 .sub-form textarea {
+  width: 100%;
   padding: 11px 14px;
   background: var(--cream);
   border: 1.5px solid var(--border-mid);
@@ -384,6 +385,17 @@
   transition: border-color 0.15s;
   font-family: var(--font-body);
 }
+.sub-form input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  min-height: 44px;
+}
+.sub-form input[type="checkbox"],
+.sub-form input[type="radio"] {
+  width: 17px;
+}
+.cl-inline-hint { font: 400 11px/1 var(--font-body); color: var(--muted); }
 .sub-form input::placeholder,
 .sub-form textarea::placeholder { color: var(--muted); }
 .sub-form input:focus,
@@ -399,9 +411,9 @@
   background-color: var(--cream);
 }
 
-.cl-date-row { display: flex; gap: 16px; }
-.cl-date-row > div { flex: 1; }
-.cl-date-sublabel { font: 600 11px/1 var(--font-body); color: var(--muted); margin: 8px 0 5px; }
+.cl-date-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.cl-date-row > div { flex: 1 1 140px; min-width: 0; display: flex; flex-direction: column; }
+.sub-form .cl-date-sublabel { font: 600 11px/1 var(--font-body); color: var(--muted); margin: 6px 0 5px; }
 
 .cl-error {
   background: rgba(220,38,38,0.08);

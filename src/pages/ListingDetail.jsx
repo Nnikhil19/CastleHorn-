@@ -9,6 +9,7 @@ import {
   addReview,
   isVerifiedEmail,
 } from "../lib/listings";
+import { Logo } from "../components/icons";
 import "./Sublets.css";
 
 export default function ListingDetail() {
@@ -21,23 +22,38 @@ export default function ListingDetail() {
   const [reviewerName, setReviewerName] = useState("");
   const [reviewText, setReviewText] = useState("");
 
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
   useEffect(() => {
     let active = true;
-    getListingById(id).then((data) => {
-      if (!active) return;
-      setListing(data);
-      if (data) setReviews(getReviews(data.id));
-    }).finally(() => active && setLoading(false));
+    getListingById(id)
+      .then((data) => { if (active) setListing(data); })
+      .finally(() => active && setLoading(false));
     return () => { active = false; };
   }, [id]);
 
-  const handleReview = (e) => {
+  // Reviews load independently so a slow reviews query never blocks the listing.
+  useEffect(() => {
+    if (!listing?.id) return;
+    let active = true;
+    getReviews(listing.id).then((loaded) => { if (active) setReviews(loaded); });
+    return () => { active = false; };
+  }, [listing?.id]);
+
+  const handleReview = async (e) => {
     e.preventDefault();
-    if (!reviewerName.trim() || !reviewText.trim()) return;
-    const updated = addReview(listing.id, { reviewer: reviewerName.trim(), text: reviewText.trim() });
-    setReviews(updated);
-    setReviewerName("");
-    setReviewText("");
+    if (!reviewerName.trim() || !reviewText.trim() || reviewSubmitting) return;
+    setReviewSubmitting(true);
+    try {
+      const updated = await addReview(listing.id, { reviewer: reviewerName.trim(), text: reviewText.trim() });
+      setReviews(updated);
+      setReviewerName("");
+      setReviewText("");
+    } catch (err) {
+      console.error("Failed to submit review:", err);
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
   const firstName = (listing?.postedBy ?? "the host").split(" ")[0];
@@ -48,7 +64,7 @@ export default function ListingDetail() {
     <div className="sub-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <Link to="/sublets" className="sub-back">Back to listings</Link>
@@ -188,7 +204,9 @@ export default function ListingDetail() {
                   onChange={(e) => setReviewerName(e.target.value)} required />
                 <textarea rows={3} placeholder="Share your experience with this listing."
                   value={reviewText} onChange={(e) => setReviewText(e.target.value)} required />
-                <button type="submit" className="ld-review-submit">Submit Review</button>
+                <button type="submit" className="ld-review-submit" disabled={reviewSubmitting}>
+                  {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                </button>
               </form>
             </div>
           </div>

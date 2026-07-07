@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { findDemoProfile } from "../lib/demoProfiles";
+import { Logo } from "../components/icons";
 import "./ProfilePage.css";
 
 const PROFILE_KEY = "ch_profileData";
@@ -83,7 +84,7 @@ export default function ProfilePage() {
       <div className="pp-page">
         <nav className="sub-nav">
           <Link to="/" className="sub-brand">
-            <span className="sub-brand-icon">C</span>
+            <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
             <span className="sub-brand-text">Castle<span>Horn</span></span>
           </Link>
           <Link to="/sublets" className="sub-back">Listings</Link>
@@ -112,7 +113,7 @@ export default function ProfilePage() {
     <div className="pp-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <Link to="/sublets" className="sub-back">Listings</Link>

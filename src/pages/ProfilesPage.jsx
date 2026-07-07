@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { mergeDemoProfiles } from "../lib/demoProfiles";
+import { Logo } from "../components/icons";
 import "./ProfilePage.css";
 import "./Sublets.css";
 
@@ -21,7 +22,7 @@ export default function ProfilesPage() {
     <div className="pp-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <Link to="/profile-setup" className="sub-back">Edit my profile</Link>

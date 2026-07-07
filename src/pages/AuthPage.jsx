@@ -4,6 +4,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   sendEmailVerification,
   onAuthStateChanged,
   signOut,
@@ -32,12 +34,23 @@ export default function AuthPage() {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState("");
 
+  // Complete any Google redirect sign-in that bounced back to this page.
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user && user.emailVerified) navigate("/");
-    });
-    return unsub;
-  }, [navigate]);
+    getRedirectResult(auth)
+      .then((result) => {
+        if (!result?.user) return;
+        if (!isVerifiedEmail(result.user.email)) {
+          signOut(auth);
+          setError("Please use a valid Google account email.");
+          return;
+        }
+        navigate("/profile-setup");
+      })
+      .catch((err) => {
+        if (err?.code) setError(friendlyError(err.code));
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const clearError = () => setError("");
 
@@ -50,6 +63,8 @@ export default function AuthPage() {
       "auth/wrong-password":         "Incorrect password. Please try again.",
       "auth/too-many-requests":      "Too many attempts. Please try again later.",
       "auth/popup-closed-by-user":   "Sign-in popup was closed. Please try again.",
+      "auth/unauthorized-domain":    "Google sign-in isn't enabled for this domain yet. An admin needs to add it in Firebase Authentication settings.",
+      "auth/operation-not-allowed":  "Google sign-in isn't turned on for this project yet. An admin needs to enable it in Firebase Authentication settings.",
     };
     return map[code] ?? "Something went wrong. Please try again.";
   };
@@ -71,17 +86,12 @@ export default function AuthPage() {
         if (name.trim()) {
           await updateProfile(user, { displayName: name.trim() });
         }
-        await sendEmailVerification(user);
-        await signOut(auth);
-        setError("Verification link sent. Verify your email, then log in to finish your profile.");
+        // Fire a verification email as a nicety, but don't block access on it.
+        sendEmailVerification(user).catch(() => {});
+        navigate("/profile-setup");
       } else {
         const { user } = await signInWithEmailAndPassword(auth, email, password);
         requireValidEmail(user.email);
-        if (!user.emailVerified) {
-          sendEmailVerification(user).catch(() => {});
-          setError("Please verify your email. We sent a new verification link.");
-          return;
-        }
         navigate("/");
       }
     } catch (err) {
@@ -103,7 +113,26 @@ export default function AuthPage() {
       }
       navigate("/profile-setup");
     } catch (err) {
-      setError(friendlyError(err.code));
+      // Popups are often blocked or fail on hosted domains (COOP). Fall back to
+      // a full-page redirect, which getRedirectResult() completes on return.
+      const popupIssue = [
+        "auth/popup-blocked",
+        "auth/popup-closed-by-user",
+        "auth/cancelled-popup-request",
+        "auth/operation-not-supported-in-this-environment",
+        "auth/web-storage-unsupported",
+        "auth/internal-error",
+      ].includes(err?.code);
+      if (popupIssue) {
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          return;
+        } catch (redirectErr) {
+          setError(friendlyError(redirectErr?.code));
+        }
+      } else {
+        setError(friendlyError(err?.code));
+      }
     } finally {
       setLoading(false);
     }
@@ -139,8 +168,8 @@ export default function AuthPage() {
         </h2>
         <p className="auth-sub">
           {mode === "login"
-            ? "Log in with your verified email to post or contact hosts."
-            : "Use any email address for testing. Verification still helps protect accounts."}
+            ? "Log in with your email to post or contact hosts."
+            : "Create an account to post a place or message hosts. You'll set up your profile next."}
         </p>
 
         <button className="google-btn" onClick={handleGoogle} disabled={loading}>

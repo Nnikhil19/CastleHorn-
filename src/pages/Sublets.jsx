@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getListings, listingImage, TERM_LABELS, FEATURE_LABELS, isVerifiedEmail } from "../lib/listings";
+import { Logo } from "../components/icons";
 import "./Sublets.css";
 
 const TERM_OPTS = [
@@ -74,7 +75,7 @@ export default function Sublets() {
     <div className="sub-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <div className="sub-nav-links">

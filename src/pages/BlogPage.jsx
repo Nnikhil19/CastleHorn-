@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Logo } from "../components/icons";
 import "./Sublets.css";
 
 export default function BlogPage() {
@@ -6,7 +7,7 @@ export default function BlogPage() {
     <div className="sub-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <Link to="/sublets" className="sub-back">Browse listings</Link>
@@ -22,7 +23,7 @@ export default function BlogPage() {
         </section>
         <section className="simple-section">
           <h2>For subletters</h2>
-          <p>Create an account with any valid email while the app is in testing mode, complete your profile, then submit a listing with the full property address, monthly rent, photos, contact info, and proof of occupancy.</p>
+          <p>Create an account with your email, complete your profile, then submit a listing with the full Austin property address, monthly rent, photos, contact info, and proof of occupancy.</p>
           <p>New listings go into manual admin review first. Once approved, they appear on the homepage, browse page, and map page.</p>
         </section>
         <section className="simple-section">

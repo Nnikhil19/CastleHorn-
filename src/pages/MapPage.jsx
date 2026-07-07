@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getListings, TERM_LABELS, listingImage } from "../lib/listings";
+import { Logo } from "../components/icons";
 import "./MapPage.css";
 
 export default function MapPage() {
@@ -26,7 +27,7 @@ export default function MapPage() {
     <div className="map-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <div className="map-nav-links">

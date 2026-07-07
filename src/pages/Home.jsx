@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { getListings, listingImage, TERM_LABELS } from "../lib/listings";
-import { SearchIcon } from "../components/icons";
+import { SearchIcon, Logo } from "../components/icons";
 import "./Home.css";
 
 const CATEGORIES = [
@@ -95,7 +95,7 @@ export default function Home() {
     <div className="home">
       <nav className="nav">
         <button className="nav-brand" onClick={() => navigate("/")}>
-          <span className="nav-brand-icon">C</span>
+          <span className="nav-brand-icon"><Logo width={22} height={22} /></span>
           <span className="nav-brand-text">Castle<span>Horn</span></span>
         </button>
         <ul className="nav-links">
@@ -123,7 +123,7 @@ export default function Home() {
       <section className="hero">
         <div className="hero-badge">
           <span className="hero-badge-dot" />
-          <span>Testing mode: all email domains allowed</span>
+          <span>Verified UT students · Manually reviewed listings</span>
         </div>
         <h1>Sublets near campus, <span className="hero-italic">minus the stress.</span></h1>
         <p className="hero-sub">
@@ -166,6 +166,7 @@ export default function Home() {
             <p className="how-eyebrow">How it works</p>
             <h2>Find a UT sublet without guessing.</h2>
           </div>
+          <button className="rooms-see-all" onClick={() => navigate("/blog")}>Read the full guide</button>
         </div>
         <div className="how-grid">
           {HOW_STEPS.map((s) => (
@@ -214,15 +215,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="blogs">
-        <h2 className="blogs-title">How CastleHorn works</h2>
-        <div className="blog-single">
-          <p>CastleHorn is in testing mode, so any valid email can create an account. Complete a profile, then browse approved listings by area, dates, rent, and roommate traits.</p>
-          <p>Subletters upload real photos, a full property address, monthly rent, and proof of occupancy. Admins review listings before they become public. Renters contact hosts directly by email or phone.</p>
-          <button className="rooms-see-all" onClick={() => navigate("/blog")}>Read the guide</button>
-        </div>
-      </section>
-
       <section className="about" id="about">
         <div className="about-text">
           <span className="about-eyebrow">About CastleHorn</span>
@@ -267,7 +259,7 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <span>© 2026 CastleHorn</span>
-          <span>Testing mode: all email domains allowed</span>
+          <span>Built for UT Austin students</span>
         </div>
       </footer>
     </div>

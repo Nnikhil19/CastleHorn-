@@ -93,20 +93,6 @@ body {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.hero::after {
-  content: "";
-  width: min(360px, 28vw);
-  height: min(360px, 28vw);
-  position: absolute;
-  right: clamp(18px, 5vw, 74px);
-  top: 64px;
-  border-radius: 999px;
-  border: 1px solid rgba(46, 107, 99, 0.18);
-  background:
-    linear-gradient(135deg, rgba(46, 107, 99, 0.12), rgba(242, 169, 0, 0.08));
-  pointer-events: none;
-}
-
 .hero > * {
   position: relative;
   z-index: 1;
@@ -326,10 +312,6 @@ body {
 
   .nav-auth {
     margin-left: auto;
-  }
-
-  .hero::after {
-    display: none;
   }
 
   .search-bar {

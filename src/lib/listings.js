@@ -4,6 +4,7 @@ import {
   addDoc,
   getDocs,
   query,
+  where,
   orderBy,
   serverTimestamp,
   doc,
@@ -31,6 +32,19 @@ export const FEATURE_LABELS = {
 
 export const isVerifiedEmail = (email = "") =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
+
+// Austin ZIP codes fall in the 786xx/787xx range (plus some 733xx PO boxes).
+const AUSTIN_ZIP = /\b7(8[67]\d\d|33\d\d)\b/;
+
+// Loose check that a posted address is actually in Austin, TX. Requires the
+// city name plus either a TX/Texas indicator or a valid Austin ZIP.
+export const isAustinAddress = (address = "") => {
+  const a = String(address).toLowerCase();
+  const hasCity = a.includes("austin");
+  const hasState = /\b(tx|texas)\b/.test(a);
+  const hasZip = AUSTIN_ZIP.test(a);
+  return hasCity && (hasState || hasZip);
+};
 
 export function listingImage(listing) {
   return listing?.photos?.[0] || listing?.image || "";
@@ -90,19 +104,63 @@ export async function removeListing(id) {
   await deleteDoc(doc(db, "listings", id));
 }
 
-const reviewKey = (id) => `ch_reviews_${id}`;
+// ── Peer reviews on a listing (shared via Firestore) ──
+const listingReviewsCol = collection(db, "listingReviews");
 
-export function getReviews(listingId) {
+const byNewest = (a, b) => (b.ts ?? 0) - (a.ts ?? 0);
+
+const reviewTs = (data) => {
+  const created = data.createdAt;
+  if (created?.toMillis) return created.toMillis();
+  return data.ts ?? 0;
+};
+
+export async function getReviews(listingId) {
   try {
-    return JSON.parse(localStorage.getItem(reviewKey(listingId)) || "[]");
-  } catch {
+    const snap = await getDocs(query(listingReviewsCol, where("listingId", "==", String(listingId))));
+    return snap.docs
+      .map((d) => {
+        const data = d.data();
+        return { id: d.id, reviewer: data.reviewer, text: data.text, ts: reviewTs(data) };
+      })
+      .sort(byNewest);
+  } catch (err) {
+    console.error("Failed to load listing reviews:", err);
     return [];
   }
 }
 
-export function addReview(listingId, { reviewer, text }) {
-  const existing = getReviews(listingId);
-  const updated = [{ reviewer, text, ts: Date.now() }, ...existing];
-  localStorage.setItem(reviewKey(listingId), JSON.stringify(updated));
-  return updated;
+export async function addReview(listingId, { reviewer, text }) {
+  await addDoc(listingReviewsCol, {
+    listingId: String(listingId),
+    reviewer,
+    text,
+    createdAt: serverTimestamp(),
+  });
+  return getReviews(listingId);
+}
+
+// ── Platform-wide reviews (shared via Firestore) ──
+const platformReviewsCol = collection(db, "platformReviews");
+
+export async function getPlatformReviews() {
+  try {
+    const snap = await getDocs(query(platformReviewsCol, orderBy("createdAt", "desc")));
+    return snap.docs.map((d) => {
+      const data = d.data();
+      return { id: d.id, name: data.name, text: data.text, ts: reviewTs(data) };
+    });
+  } catch (err) {
+    console.error("Failed to load platform reviews:", err);
+    return [];
+  }
+}
+
+export async function addPlatformReview({ name, text }) {
+  await addDoc(platformReviewsCol, {
+    name,
+    text,
+    createdAt: serverTimestamp(),
+  });
+  return getPlatformReviews();
 }

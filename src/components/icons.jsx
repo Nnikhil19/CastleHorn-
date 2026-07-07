@@ -49,3 +49,23 @@ export const MapPinIcon = (props) => (
     <circle cx="12" cy="10" r="3" />
   </svg>
 );
+
+// CastleHorn mark: an isometric castle cube. Renders in currentColor so it
+// works as a white glyph on the orange brand chip or standalone in orange.
+export const Logo = (props) => (
+  <svg viewBox="0 0 48 48" width="24" height="24" fill="currentColor" aria-hidden="true" {...props}>
+    {/* battlement merlons rising from the two back edges of the top */}
+    <g opacity="0.95">
+      <path d="M9 16 L13.2 13.6 L13.2 8.6 L9 11 Z" />
+      <path d="M16.6 11.6 L20.8 9.2 L20.8 4.2 L16.6 6.6 Z" />
+      <path d="M27.2 9.2 L31.4 11.6 L31.4 6.6 L27.2 4.2 Z" />
+      <path d="M34.8 13.6 L39 16 L39 11 L34.8 8.6 Z" />
+    </g>
+    {/* top face */}
+    <path d="M24 6 L41 15.7 L24 25.4 L7 15.7 Z" opacity="0.95" />
+    {/* left face */}
+    <path d="M7 15.7 L24 25.4 L24 43 L7 33.3 Z" opacity="0.72" />
+    {/* right face */}
+    <path d="M41 15.7 L24 25.4 L24 43 L41 33.3 Z" opacity="0.55" />
+  </svg>
+);

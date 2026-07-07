@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { Logo } from "../components/icons";
 import "./Sublets.css";
 
 const PAGES = {
@@ -66,7 +67,7 @@ export default function LegalPage() {
     <div className="sub-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <Link to="/sublets" className="sub-back">Browse listings</Link>

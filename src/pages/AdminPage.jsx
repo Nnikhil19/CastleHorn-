@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { approveListing, getListings, rejectListing, removeListing } from "../lib/listings";
+import { Logo } from "../components/icons";
 import "./Sublets.css";
 
 const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS || "")
@@ -56,7 +57,7 @@ export default function AdminPage() {
     <div className="sub-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <Link to="/sublets" className="sub-back">Browse listings</Link>

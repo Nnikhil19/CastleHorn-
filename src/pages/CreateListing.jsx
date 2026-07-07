@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { addListing, FEATURE_LABELS, isVerifiedEmail } from "../lib/listings";
+import { addListing, FEATURE_LABELS, isVerifiedEmail, isAustinAddress } from "../lib/listings";
 import { auth, storage } from "../config/firebase";
+import { Logo } from "../components/icons";
 import "./Sublets.css";
 
 const MAX_PHOTO_MB = 8;
@@ -83,11 +84,7 @@ export default function CreateListing() {
     const price = parseInt(form.monthlyRent, 10);
 
     if (!user) {
-      setError("Please create or log into a verified account before posting.");
-      return;
-    }
-    if (!user.emailVerified) {
-      setError("Please verify your email before posting a listing.");
+      setError("Please create or log into an account before posting.");
       return;
     }
     if (!profile.username) {
@@ -100,6 +97,10 @@ export default function CreateListing() {
     }
     if (!form.title || !form.startDate || !form.endDate || !form.desc || !form.name || !form.address || isNaN(price)) {
       setError("Please fill in every required field with a valid monthly rent.");
+      return;
+    }
+    if (!isAustinAddress(form.address)) {
+      setError("Listings must be located in Austin, TX. Please enter a full Austin address.");
       return;
     }
     if (form.endDate < form.startDate) {
@@ -170,7 +171,7 @@ export default function CreateListing() {
     <div className="sub-page">
       <nav className="sub-nav">
         <Link to="/" className="sub-brand">
-          <span className="sub-brand-icon">C</span>
+          <span className="sub-brand-icon"><Logo width={22} height={22} /></span>
           <span className="sub-brand-text">Castle<span>Horn</span></span>
         </Link>
         <Link to="/sublets" className="sub-back">Back to listings</Link>
@@ -182,7 +183,7 @@ export default function CreateListing() {
           <p className="cl-sub">Every listing needs real photos, a full property address, proof of occupancy, and admin review.</p>
 
           {!user && (
-            <p className="cl-error">You need to log in with a verified email before posting.</p>
+            <p className="cl-error">You need to log in before posting.</p>
           )}
 
           <form onSubmit={handleSubmit} className="sub-form">
@@ -194,8 +195,8 @@ export default function CreateListing() {
             <input id="new-location" type="text" required placeholder="West Campus, Austin"
               value={form.location} onChange={(e) => setField("location", e.target.value)} />
 
-            <label htmlFor="new-address">Full Property Address *</label>
-            <input id="new-address" type="text" required placeholder="Street address, unit, city, state, ZIP"
+            <label htmlFor="new-address">Full Property Address * <span className="cl-inline-hint">(must be in Austin, TX)</span></label>
+            <input id="new-address" type="text" required placeholder="2200 Nueces St, Austin, TX 78705"
               value={form.address} onChange={(e) => setField("address", e.target.value)} />
 
             <label>Dates Available *</label>
