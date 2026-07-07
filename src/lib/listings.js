@@ -10,6 +10,7 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
+import { mergeDemoListings } from "./demoListings";
 
 const listingsCol = collection(db, "listings");
 const FIRESTORE_TIMEOUT_MS = 5000;
@@ -47,11 +48,11 @@ export async function getListings({ includePending = false } = {}) {
         setTimeout(() => reject(new Error("Listing request timed out")), FIRESTORE_TIMEOUT_MS)
       ),
     ]);
-    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const all = mergeDemoListings(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     return includePending ? all : all.filter((l) => !l.underReview && l.status !== "rejected");
   } catch (err) {
     console.error("Failed to load listings from Firestore:", err);
-    return [];
+    return mergeDemoListings([]);
   }
 }
 
