@@ -127,7 +127,7 @@ export default function Home() {
         </div>
         <h1>Sublets near campus, <span className="hero-italic">minus the stress.</span></h1>
         <p className="hero-sub">
-          Search approved UT student listings with real photos, addresses, proof-of-occupancy review, and direct contact info.
+          Search approved student listings with real photos, addresses, proof-of-occupancy review, and direct contact info.
         </p>
         <div className="search-bar">
           <div className="search-field">
