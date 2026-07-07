@@ -46,7 +46,7 @@ function RoomCard({ item, onClick }) {
       <div className="room-card-body">
         <div className="room-card-row">
           <h3>{item.location || item.title}</h3>
-          <span className="room-card-rating">{item.status === "approved" ? "Verified" : "New"}</span>
+          <span className="room-card-rating">{item.status === "approved" ? "Verified" : "Pending review"}</span>
         </div>
         <p className="room-card-dates">{item.dates}</p>
         <p className="room-card-price"><strong>${item.price}</strong> {item.priceUnit}</p>

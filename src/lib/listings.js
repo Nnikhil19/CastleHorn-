@@ -109,7 +109,9 @@ export async function getListings({ includePending = false } = {}) {
     console.error("Failed to load listings from Firestore:", err);
   }
   const all = mergeDemoListings([...readLocal(LOCAL_LISTINGS_KEY), ...fetched]);
-  return includePending ? all : all.filter((l) => !l.underReview && l.status !== "rejected");
+  // Pending listings stay publicly visible (badged "awaiting approval" in the
+  // UI) so new posts show up immediately; only rejected ones are hidden.
+  return includePending ? all : all.filter((l) => l.status !== "rejected");
 }
 
 export async function getListingById(id) {
@@ -131,13 +133,14 @@ export async function addListing(listing) {
     );
   } catch (err) {
     // Firestore unavailable: keep the listing on this device so the flow
-    // still completes. Local listings show immediately (no admin queue).
+    // still completes. It enters the same pending state as a normal post
+    // and shows publicly with the "awaiting approval" warning.
     console.warn("Firestore unavailable, saving listing locally:", err);
     pushLocal(LOCAL_LISTINGS_KEY, {
       ...listing,
       id: `local-${crypto.randomUUID()}`,
-      underReview: false,
-      status: "approved",
+      underReview: true,
+      status: "pending",
       savedLocally: true,
       ts: Date.now(),
     });

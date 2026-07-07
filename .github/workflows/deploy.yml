@@ -25,6 +25,10 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
+        env:
+          # Accounts allowed to use /admin. Override by setting an ADMIN_EMAILS
+          # repository variable (Settings > Secrets and variables > Actions).
+          VITE_ADMIN_EMAILS: ${{ vars.ADMIN_EMAILS || 'nikhilsyt.2010@gmail.com' }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

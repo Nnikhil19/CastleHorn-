@@ -97,7 +97,7 @@ export default function ListingDetail() {
               <h1 className="ld-title">{listing.title}</h1>
               {isVerifiedEmail(listing.posterEmail) && <span className="listing-badge badge-verified">Email Verified</span>}
               {listing.status === "approved" && <span className="listing-badge badge-approved">Approved</span>}
-              {listing.underReview && <span className="listing-badge badge-review">Under Review</span>}
+              {(listing.underReview || listing.status === "pending") && <span className="listing-badge badge-review">Awaiting approval</span>}
             </div>
 
             <p className="ld-postedby">
@@ -105,8 +105,11 @@ export default function ListingDetail() {
               Posted by {listing.postedBy}
             </p>
 
-            {listing.underReview && (
-              <div className="ld-under-review">This listing is visible by direct link only until admin review is complete.</div>
+            {(listing.underReview || listing.status === "pending") && (
+              <div className="ld-under-review">
+                Heads up: this listing is awaiting admin approval. Its photos, address, and proof of
+                occupancy haven't been verified yet — confirm details directly with the host before paying anything.
+              </div>
             )}
 
             <div className="ld-facts">

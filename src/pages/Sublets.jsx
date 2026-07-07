@@ -131,7 +131,7 @@ export default function Sublets() {
         <main>
           <div className="sub-browse-header">
             <p className="sub-browse-eyebrow">Browse</p>
-            <h1>Approved sublets near UT</h1>
+            <h1>Sublets near UT</h1>
           </div>
 
           <p className="sub-feed-count">{loading ? "Checking approved listings..." : `${filtered.length} places match`}</p>
@@ -165,6 +165,9 @@ export default function Sublets() {
                     <div className="listing-badges">
                       {isVerifiedEmail(item.posterEmail) && <span className="listing-badge badge-verified">Email Verified</span>}
                       {item.status === "approved" && <span className="listing-badge badge-approved">Approved</span>}
+                      {(item.underReview || item.status === "pending") && (
+                        <span className="listing-badge badge-review">Awaiting approval — not yet verified</span>
+                      )}
                     </div>
                     {item.features?.length > 0 && (
                       <div className="sub-tags">
